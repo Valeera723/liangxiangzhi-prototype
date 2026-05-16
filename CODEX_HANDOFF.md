@@ -9,7 +9,7 @@
 ```text
 请你接手这个 GitHub 仓库继续开发《两相知》原型。
 
-仓库地址：请替换为最终 GitHub URL
+仓库地址：https://github.com/Valeera723/liangxiangzhi-prototype.git
 
 请按以下方式开始：
 1. 先 clone 仓库并阅读 README.md、CODEX_HANDOFF.md、two-xiangzhi-prd.md、generation-playbook.md。
