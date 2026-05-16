@@ -1,0 +1,3130 @@
+<!doctype html>
+<html lang="zh-CN">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>两相知 - 古法双相关系原型</title>
+    <style>
+      :root {
+        color-scheme: light;
+        --ink: #1b1a16;
+        --muted: #6d6659;
+        --paper: #f7f1e4;
+        --paper-deep: #eee2cd;
+        --line: #d6c7ad;
+        --seal: #a2322c;
+        --tea: #436b5b;
+        --tea-dark: #264c42;
+        --gold: #9a742e;
+        --aether: #2f8f91;
+        --white: #fffaf0;
+        --shadow: 0 22px 70px rgba(38, 29, 17, 0.16);
+      }
+
+      * {
+        box-sizing: border-box;
+      }
+
+      body {
+        margin: 0;
+        min-height: 100vh;
+        background:
+          radial-gradient(circle at 50% 8%, rgba(154, 116, 46, 0.18), transparent 34%),
+          linear-gradient(90deg, rgba(67, 107, 91, 0.08) 1px, transparent 1px),
+          linear-gradient(0deg, rgba(67, 107, 91, 0.06) 1px, transparent 1px),
+          #e9e0cf;
+        background-size: auto, 28px 28px, 28px 28px, auto;
+        color: var(--ink);
+        font-family:
+          -apple-system, BlinkMacSystemFont, "PingFang SC", "Noto Serif CJK SC",
+          "Songti SC", "SimSun", serif;
+      }
+
+      button,
+      input {
+        font: inherit;
+      }
+
+      button {
+        cursor: pointer;
+      }
+
+      .stage {
+        display: grid;
+        min-height: 100vh;
+        place-items: center;
+        padding: 22px;
+      }
+
+      .phone {
+        width: min(430px, 100%);
+        min-height: min(860px, calc(100vh - 44px));
+        overflow: hidden;
+        border: 1px solid rgba(63, 47, 25, 0.22);
+        border-radius: 8px;
+        background:
+          linear-gradient(180deg, rgba(255, 250, 240, 0.86), rgba(247, 241, 228, 0.96)),
+          var(--paper);
+        box-shadow: var(--shadow);
+      }
+
+      .app {
+        position: relative;
+        min-height: inherit;
+      }
+
+      .topbar {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        min-height: 58px;
+        padding: 12px 18px;
+        border-bottom: 1px solid rgba(63, 47, 25, 0.12);
+        background: rgba(255, 250, 240, 0.72);
+        backdrop-filter: blur(14px);
+      }
+
+      .brand {
+        display: flex;
+        align-items: center;
+        gap: 10px;
+        font-weight: 900;
+      }
+
+      .seal {
+        display: grid;
+        width: 32px;
+        height: 32px;
+        place-items: center;
+        border: 2px solid var(--seal);
+        color: var(--seal);
+        font-size: 15px;
+        line-height: 1;
+      }
+
+      .chapter {
+        color: var(--muted);
+        font-size: 12px;
+      }
+
+      .screen {
+        display: none;
+        min-height: calc(100vh - 58px);
+        animation: fadeIn 360ms ease both;
+      }
+
+      .screen.active {
+        display: block;
+      }
+
+      @keyframes fadeIn {
+        from {
+          opacity: 0;
+          transform: translateY(12px);
+        }
+        to {
+          opacity: 1;
+          transform: translateY(0);
+        }
+      }
+
+      .intro {
+        display: grid;
+        min-height: calc(100vh - 58px);
+        position: relative;
+        align-content: stretch;
+        gap: 0;
+        overflow: hidden;
+        padding: 0;
+        background:
+          linear-gradient(180deg, rgba(255, 250, 240, 0.4), rgba(247, 241, 228, 0.95) 78%),
+          radial-gradient(circle at 80% 22%, rgba(162, 50, 44, 0.12), transparent 28%);
+      }
+
+      .manuscript-art {
+        position: absolute;
+        inset: 0;
+        width: 100%;
+        height: 100%;
+        object-fit: cover;
+        opacity: 0.58;
+        filter: sepia(0.2) saturate(0.8) contrast(0.96);
+      }
+
+      .intro::after {
+        position: absolute;
+        inset: 0;
+        background:
+          linear-gradient(90deg, rgba(247, 241, 228, 0.08), rgba(247, 241, 228, 0.72) 58%, rgba(247, 241, 228, 0.94)),
+          linear-gradient(180deg, rgba(27, 26, 22, 0.08), transparent 28%, rgba(247, 241, 228, 0.9));
+        content: "";
+      }
+
+      .intro-content {
+        position: relative;
+        z-index: 1;
+        display: grid;
+        min-height: calc(100vh - 58px);
+        grid-template-columns: 1fr auto;
+        gap: 18px;
+        align-items: stretch;
+        padding: 28px 22px 22px;
+      }
+
+      .vertical-copy {
+        display: flex;
+        justify-content: flex-end;
+        gap: 18px;
+        writing-mode: vertical-rl;
+        text-orientation: mixed;
+      }
+
+      .quote {
+        position: relative;
+        border: 1px solid rgba(154, 116, 46, 0.42);
+        background: rgba(255, 250, 240, 0.5);
+        padding: 16px 13px;
+      }
+
+      .quote::before,
+      .quote::after {
+        position: absolute;
+        width: 22px;
+        height: 22px;
+        border-color: var(--gold);
+        content: "";
+      }
+
+      .quote::before {
+        top: 8px;
+        left: 8px;
+        border-top: 1px solid;
+        border-left: 1px solid;
+      }
+
+      .quote::after {
+        right: 8px;
+        bottom: 8px;
+        border-right: 1px solid;
+        border-bottom: 1px solid;
+      }
+
+      .quote small {
+        display: block;
+        margin-left: 10px;
+        color: var(--tea-dark);
+        font-weight: 800;
+      }
+
+      .quote p {
+        margin: 0;
+        font-size: 22px;
+        line-height: 1.72;
+        letter-spacing: 0;
+      }
+
+      .title-block {
+        display: grid;
+        align-content: end;
+        justify-items: end;
+        gap: 14px;
+      }
+
+      .title-block h1 {
+        margin: 0;
+        font-size: 42px;
+        line-height: 1.15;
+        letter-spacing: 0;
+        writing-mode: vertical-rl;
+        text-orientation: mixed;
+      }
+
+      .title-block p,
+      .muted {
+        margin: 0;
+        color: var(--muted);
+        font-size: 14px;
+        line-height: 1.7;
+      }
+
+      .title-block p {
+        max-height: 236px;
+        writing-mode: vertical-rl;
+        text-orientation: mixed;
+      }
+
+      .primary,
+      .secondary,
+      .ghost,
+      .choice {
+        min-height: 46px;
+        border: 1px solid var(--line);
+        border-radius: 6px;
+        background: var(--white);
+        color: var(--ink);
+        font-weight: 800;
+      }
+
+      .primary {
+        width: 100%;
+        border-color: var(--tea-dark);
+        background: var(--tea-dark);
+        color: #fffdf5;
+      }
+
+      .secondary {
+        border-color: rgba(162, 50, 44, 0.34);
+        color: var(--seal);
+      }
+
+      .ghost {
+        background: transparent;
+      }
+
+      main {
+        display: grid;
+        gap: 12px;
+        padding: 14px;
+      }
+
+      .panel {
+        position: relative;
+        overflow: hidden;
+        border: 1px solid var(--line);
+        border-radius: 8px;
+        background:
+          linear-gradient(135deg, rgba(67, 107, 91, 0.08), transparent 34%),
+          rgba(255, 250, 240, 0.78);
+      }
+
+      .panel::after,
+      .reading article::after,
+      .report::after {
+        position: absolute;
+        right: -34px;
+        bottom: -44px;
+        width: 150px;
+        height: 150px;
+        background: url("../assets/ink-face-manuscript.png") center / cover no-repeat;
+        content: "";
+        opacity: 0.08;
+        pointer-events: none;
+      }
+
+      .panel > *,
+      .reading article > *,
+      .report > * {
+        position: relative;
+        z-index: 1;
+      }
+
+      .panel-head {
+        position: relative;
+        z-index: 1;
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        gap: 12px;
+        padding: 14px 14px 0;
+      }
+
+      h2,
+      h3,
+      p {
+        margin-top: 0;
+      }
+
+      h2 {
+        margin-bottom: 0;
+        font-size: 18px;
+      }
+
+      h3 {
+        margin-bottom: 8px;
+        color: var(--tea-dark);
+        font-size: 15px;
+      }
+
+      .hint {
+        color: var(--muted);
+        font-size: 12px;
+        white-space: nowrap;
+      }
+
+      .upload-grid {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: 10px;
+        padding: 14px;
+      }
+
+      .upload {
+        display: grid;
+        position: relative;
+        min-height: 156px;
+        place-items: center;
+        overflow: hidden;
+        border: 1px solid var(--line);
+        border-radius: 6px;
+        background:
+          linear-gradient(135deg, rgba(67, 107, 91, 0.1), transparent),
+          var(--white);
+        color: var(--tea-dark);
+        cursor: pointer;
+      }
+
+      .upload input {
+        position: absolute;
+        width: 1px;
+        height: 1px;
+        opacity: 0;
+      }
+
+      .upload img {
+        position: absolute;
+        inset: 0;
+        width: 100%;
+        height: 100%;
+        object-fit: cover;
+      }
+
+      .upload span {
+        z-index: 1;
+        display: grid;
+        width: 74px;
+        height: 74px;
+        place-items: center;
+        border: 1px solid rgba(67, 107, 91, 0.24);
+        background: rgba(255, 250, 240, 0.78);
+        font-weight: 900;
+      }
+
+      .upload.has-image span {
+        align-self: end;
+        width: auto;
+        height: auto;
+        margin-bottom: 10px;
+        padding: 6px 10px;
+        color: var(--ink);
+        font-size: 12px;
+      }
+
+      .consent {
+        display: flex;
+        gap: 10px;
+        padding: 0 14px 14px;
+        color: var(--muted);
+        font-size: 12px;
+        line-height: 1.55;
+      }
+
+      .consent input {
+        width: 18px;
+        height: 18px;
+        margin-top: 1px;
+        accent-color: var(--tea);
+      }
+
+      .engine-pill {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        gap: 10px;
+        margin: 0 14px 14px;
+        border: 1px solid rgba(67, 107, 91, 0.2);
+        border-radius: 6px;
+        background: rgba(255, 250, 240, 0.58);
+        padding: 9px 10px;
+        color: var(--tea-dark);
+        font-size: 12px;
+        line-height: 1.45;
+      }
+
+      .engine-pill strong {
+        white-space: nowrap;
+      }
+
+      .actions {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: 10px;
+        padding: 0 14px 14px;
+      }
+
+      .single-action {
+        grid-template-columns: 1fr;
+      }
+
+      .ask-panel,
+      .form-block,
+      .question-list {
+        display: grid;
+        gap: 10px;
+        padding: 14px;
+      }
+
+      .ask-panel {
+        margin: 0 14px 14px;
+        border: 1px solid rgba(67, 107, 91, 0.22);
+        border-radius: 8px;
+        background:
+          linear-gradient(135deg, rgba(47, 143, 145, 0.08), transparent 44%),
+          rgba(255, 250, 240, 0.7);
+      }
+
+      .ask-panel h3,
+      .form-block label,
+      .question-card label {
+        margin: 0;
+        color: var(--tea-dark);
+        font-size: 14px;
+        font-weight: 900;
+      }
+
+      .ask-panel p {
+        margin: 0;
+        color: var(--muted);
+        font-size: 13px;
+        line-height: 1.7;
+      }
+
+      .ask-actions {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: 9px;
+      }
+
+      textarea,
+      input[type="text"] {
+        width: 100%;
+        border: 1px solid rgba(109, 102, 89, 0.26);
+        border-radius: 6px;
+        background: rgba(255, 250, 240, 0.76);
+        color: var(--ink);
+        padding: 10px;
+        line-height: 1.65;
+        outline: none;
+      }
+
+      textarea:focus,
+      input[type="text"]:focus {
+        border-color: rgba(67, 107, 91, 0.68);
+        box-shadow: 0 0 0 2px rgba(67, 107, 91, 0.12);
+      }
+
+      .form-block textarea {
+        min-height: 116px;
+        resize: vertical;
+      }
+
+      .question-card {
+        display: grid;
+        gap: 8px;
+        border: 1px solid rgba(214, 199, 173, 0.82);
+        border-radius: 8px;
+        background: rgba(255, 250, 240, 0.62);
+        padding: 12px;
+      }
+
+      .question-card textarea {
+        min-height: 78px;
+        resize: vertical;
+      }
+
+      .option-grid {
+        display: grid;
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+        gap: 8px;
+      }
+
+      .option-choice {
+        min-height: 40px;
+        border: 1px solid rgba(109, 102, 89, 0.24);
+        border-radius: 6px;
+        background: rgba(255, 250, 240, 0.72);
+        color: var(--ink);
+        padding: 8px;
+        font-size: 12px;
+        font-weight: 800;
+        line-height: 1.35;
+        text-align: left;
+      }
+
+      .option-choice.active {
+        border-color: rgba(67, 107, 91, 0.7);
+        background: rgba(229, 238, 231, 0.88);
+        color: var(--tea-dark);
+        box-shadow: inset 0 0 0 1px rgba(67, 107, 91, 0.14);
+      }
+
+      .llm-note {
+        margin: 0;
+        color: var(--muted);
+        font-size: 12px;
+        line-height: 1.65;
+      }
+
+      .analysis {
+        position: relative;
+        z-index: 1;
+        display: grid;
+        gap: 12px;
+        padding: 14px;
+      }
+
+      .person-card {
+        position: relative;
+        border: 1px solid var(--line);
+        border-radius: 8px;
+        background:
+          linear-gradient(180deg, rgba(255, 250, 240, 0.82), rgba(238, 226, 205, 0.52)),
+          rgba(255, 250, 240, 0.86);
+        padding: 14px;
+      }
+
+      .person-title {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        margin-bottom: 10px;
+      }
+
+      .person-title strong {
+        font-size: 17px;
+      }
+
+      .term-list {
+        display: grid;
+        gap: 8px;
+        margin: 0;
+        padding: 0;
+        list-style: none;
+      }
+
+      .term-list li {
+        border-left: 3px solid rgba(154, 116, 46, 0.55);
+        padding-left: 10px;
+        color: var(--muted);
+        font-size: 13px;
+        line-height: 1.65;
+      }
+
+      .term-list b {
+        color: var(--ink);
+      }
+
+      .term-list span {
+        display: block;
+        margin-top: 2px;
+      }
+
+      .type-card {
+        display: grid;
+        grid-template-columns: auto 1fr;
+        gap: 12px;
+        align-items: center;
+        margin: 0 0 12px;
+        border: 1px solid rgba(162, 50, 44, 0.18);
+        border-radius: 8px;
+        background:
+          linear-gradient(135deg, rgba(162, 50, 44, 0.07), transparent 40%),
+          rgba(255, 250, 240, 0.72);
+        padding: 11px;
+      }
+
+      .type-avatar {
+        width: 68px;
+        height: 68px;
+        border: 2px solid rgba(162, 50, 44, 0.48);
+        border-radius: 50%;
+        background:
+          linear-gradient(rgba(255, 250, 240, 0.02), rgba(255, 250, 240, 0.02)),
+          url("../assets/fbti-historical-portraits.png");
+        background-position: var(--portrait-position, 0% 0%);
+        background-size: 400% 200%;
+        box-shadow:
+          inset 0 0 0 3px rgba(255, 250, 240, 0.5),
+          0 8px 20px rgba(63, 47, 25, 0.12);
+      }
+
+      .type-info {
+        min-width: 0;
+      }
+
+      .type-kicker {
+        color: var(--muted);
+        font-size: 11px;
+        font-weight: 900;
+      }
+
+      .type-info h4 {
+        margin: 2px 0 4px;
+        color: var(--ink);
+        font-size: 16px;
+        line-height: 1.25;
+      }
+
+      .type-info p {
+        margin: 0;
+        color: var(--muted);
+        font-size: 12px;
+        line-height: 1.55;
+      }
+
+      .type-info .figure-line {
+        margin-top: 4px;
+        color: var(--tea-dark);
+        font-weight: 800;
+      }
+
+      .axis-tags {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 5px;
+        margin-top: 7px;
+      }
+
+      .axis-tags span {
+        border: 1px solid rgba(67, 107, 91, 0.22);
+        border-radius: 999px;
+        background: rgba(229, 238, 231, 0.62);
+        color: var(--tea-dark);
+        padding: 3px 7px;
+        font-size: 11px;
+        font-weight: 800;
+      }
+
+      .measure-list {
+        display: grid;
+        gap: 6px;
+        margin: 12px 0 0;
+        border-top: 1px solid rgba(214, 199, 173, 0.78);
+        padding-top: 10px;
+        color: var(--muted);
+        font-size: 12px;
+        line-height: 1.55;
+      }
+
+      .measure-title {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        gap: 10px;
+        margin: 10px 0 8px;
+        color: var(--tea-dark);
+        font-size: 12px;
+        font-weight: 900;
+      }
+
+      .metric-grid {
+        display: grid;
+        gap: 6px;
+        margin: 0 0 10px;
+      }
+
+      .metric-row {
+        display: grid;
+        grid-template-columns: 58px 40px 1fr;
+        align-items: center;
+        gap: 8px;
+        border-top: 1px solid rgba(214, 199, 173, 0.5);
+        padding-top: 6px;
+        color: var(--muted);
+        font-size: 12px;
+        line-height: 1.45;
+      }
+
+      .metric-row strong {
+        color: var(--tea-dark);
+        font-size: 15px;
+      }
+
+      .metric-row em {
+        color: var(--ink);
+        font-style: normal;
+      }
+
+      .signal-line {
+        display: grid;
+        grid-template-columns: 66px 1fr auto;
+        align-items: center;
+        gap: 8px;
+        margin-top: 10px;
+        color: var(--muted);
+        font-size: 12px;
+      }
+
+      .signal-bar {
+        height: 6px;
+        overflow: hidden;
+        border-radius: 3px;
+        background: rgba(109, 102, 89, 0.18);
+      }
+
+      .signal-bar span {
+        display: block;
+        height: 100%;
+        background: linear-gradient(90deg, var(--tea), var(--gold));
+      }
+
+      .oracle {
+        display: grid;
+        min-height: calc(100vh - 58px);
+        align-content: center;
+        gap: 18px;
+        padding: 24px;
+        background:
+          linear-gradient(180deg, rgba(255, 250, 240, 0.26), rgba(247, 241, 228, 0.94)),
+          url("../assets/ink-face-manuscript.png") center / cover no-repeat;
+      }
+
+      .oracle-box {
+        border: 1px solid rgba(154, 116, 46, 0.46);
+        background: rgba(255, 250, 240, 0.72);
+        padding: 22px;
+        backdrop-filter: blur(3px);
+      }
+
+      .oracle-title {
+        margin: 0 0 14px;
+        color: var(--tea-dark);
+        font-size: 22px;
+        font-weight: 900;
+        text-align: center;
+      }
+
+      .oracle-text {
+        min-height: 54px;
+        margin: 0;
+        color: var(--ink);
+        font-size: 18px;
+        line-height: 1.9;
+        text-align: center;
+      }
+
+      .oracle-engine {
+        margin: -8px 0 16px;
+        color: var(--tea-dark);
+        font-size: 12px;
+        font-weight: 800;
+        line-height: 1.6;
+        text-align: center;
+      }
+
+      .scan-grid {
+        display: grid;
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+        gap: 10px;
+        margin: 0 0 16px;
+      }
+
+      .scan-card {
+        position: relative;
+        overflow: hidden;
+        border: 1px solid rgba(47, 143, 145, 0.34);
+        border-radius: 6px;
+        background:
+          linear-gradient(180deg, rgba(255, 250, 240, 0.42), rgba(27, 26, 22, 0.18)),
+          radial-gradient(circle at 50% 18%, rgba(154, 116, 46, 0.24), transparent 34%),
+          rgba(255, 250, 240, 0.58);
+      }
+
+      .scan-card::before {
+        position: absolute;
+        inset: 0;
+        background:
+          linear-gradient(90deg, rgba(47, 143, 145, 0.1) 1px, transparent 1px),
+          linear-gradient(0deg, rgba(47, 143, 145, 0.08) 1px, transparent 1px);
+        background-size: 18px 18px;
+        content: "";
+        opacity: 0.55;
+        pointer-events: none;
+        z-index: 2;
+      }
+
+      .scan-card::after {
+        position: absolute;
+        left: 0;
+        right: 0;
+        top: -40%;
+        height: 42%;
+        background: linear-gradient(180deg, transparent, rgba(47, 143, 145, 0.32), transparent);
+        content: "";
+        mix-blend-mode: multiply;
+        pointer-events: none;
+        z-index: 3;
+      }
+
+      .scan-card.scanning::after {
+        animation: sweepScan 1.7s ease-in-out infinite;
+      }
+
+      .focus-card {
+        width: min(260px, 100%);
+        margin: 0 auto 12px;
+        border-color: rgba(47, 143, 145, 0.58);
+        box-shadow:
+          0 0 0 1px rgba(255, 250, 240, 0.42),
+          0 18px 46px rgba(38, 29, 17, 0.18),
+          0 0 38px rgba(47, 143, 145, 0.18);
+        transform-origin: center;
+      }
+
+      .focus-card::before {
+        background:
+          radial-gradient(circle at 50% 50%, transparent 0 38%, rgba(47, 143, 145, 0.2) 39% 40%, transparent 41%),
+          linear-gradient(90deg, rgba(47, 143, 145, 0.18) 1px, transparent 1px),
+          linear-gradient(0deg, rgba(47, 143, 145, 0.12) 1px, transparent 1px);
+        background-size: auto, 20px 20px, 20px 20px;
+        opacity: 0.8;
+      }
+
+      .focus-card.switching {
+        animation: focusSwap 980ms ease both;
+      }
+
+      .focus-card .scan-canvas {
+        aspect-ratio: 1 / 1;
+      }
+
+      .focus-card .scan-label {
+        left: 10px;
+        right: 10px;
+        bottom: 10px;
+        background: rgba(27, 26, 22, 0.62);
+        font-size: 12px;
+      }
+
+      .ai-phase-row {
+        display: grid;
+        grid-template-columns: repeat(3, 1fr);
+        gap: 7px;
+        margin: -2px 0 12px;
+      }
+
+      .ai-phase-row span {
+        position: relative;
+        overflow: hidden;
+        border: 1px solid rgba(47, 143, 145, 0.28);
+        background:
+          linear-gradient(90deg, rgba(47, 143, 145, 0.12), rgba(255, 250, 240, 0.56)),
+          rgba(255, 250, 240, 0.46);
+        color: var(--tea-dark);
+        padding: 6px 7px;
+        font-size: 10px;
+        font-weight: 900;
+        line-height: 1.2;
+        text-align: center;
+        white-space: nowrap;
+      }
+
+      .ai-phase-row span::after {
+        position: absolute;
+        inset: 0;
+        background: linear-gradient(90deg, transparent, rgba(255, 250, 240, 0.7), transparent);
+        content: "";
+        transform: translateX(-120%);
+        animation: dataSweep 1.9s linear infinite;
+      }
+
+      .ai-phase-row span:nth-child(2)::after {
+        animation-delay: 420ms;
+      }
+
+      .ai-phase-row span:nth-child(3)::after {
+        animation-delay: 760ms;
+      }
+
+      .scan-canvas {
+        display: block;
+        width: 100%;
+        aspect-ratio: 3 / 4;
+      }
+
+      .scan-label {
+        position: absolute;
+        left: 8px;
+        right: 8px;
+        bottom: 8px;
+        z-index: 4;
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        gap: 6px;
+        border: 1px solid rgba(255, 250, 240, 0.42);
+        background: rgba(27, 26, 22, 0.54);
+        color: #fffaf0;
+        padding: 5px 7px;
+        font-size: 11px;
+        line-height: 1.2;
+      }
+
+      .scan-label b {
+        font-size: 12px;
+      }
+
+      .scan-label span {
+        color: rgba(255, 250, 240, 0.78);
+      }
+
+      @keyframes sweepScan {
+        0% {
+          transform: translateY(-10%);
+          opacity: 0;
+        }
+        18% {
+          opacity: 1;
+        }
+        100% {
+          transform: translateY(330%);
+          opacity: 0;
+        }
+      }
+
+      @keyframes focusSwap {
+        0% {
+          opacity: 0.62;
+          transform: scale(0.9);
+          filter: saturate(0.82) contrast(0.94);
+        }
+        34% {
+          opacity: 1;
+          transform: scale(1.045);
+          filter: saturate(1.08) contrast(1.04);
+        }
+        100% {
+          opacity: 1;
+          transform: scale(1);
+          filter: saturate(1) contrast(1);
+        }
+      }
+
+      @keyframes dataSweep {
+        to {
+          transform: translateX(120%);
+        }
+      }
+
+      .ink-wheel {
+        position: relative;
+        width: 74px;
+        height: 74px;
+        margin: 0 auto 12px;
+        border: 1px solid rgba(154, 116, 46, 0.32);
+        border-radius: 50%;
+      }
+
+      .ink-wheel::before,
+      .ink-wheel::after {
+        position: absolute;
+        border-radius: 50%;
+        content: "";
+      }
+
+      .ink-wheel::before {
+        inset: 14px;
+        border: 2px solid transparent;
+        border-top-color: var(--tea-dark);
+        border-right-color: rgba(154, 116, 46, 0.7);
+        animation: spinInk 1.4s linear infinite;
+      }
+
+      .ink-wheel::after {
+        inset: 34px;
+        background: rgba(67, 107, 91, 0.16);
+      }
+
+      @keyframes spinInk {
+        to {
+          transform: rotate(360deg);
+        }
+      }
+
+      .oracle-steps {
+        display: grid;
+        gap: 8px;
+      }
+
+      .oracle-step {
+        display: grid;
+        grid-template-columns: auto 1fr;
+        gap: 8px;
+        color: var(--muted);
+        font-size: 13px;
+      }
+
+      .oracle-step.active {
+        color: var(--tea-dark);
+        font-weight: 900;
+      }
+
+      .choice-grid {
+        display: grid;
+        grid-template-columns: repeat(2, 1fr);
+        gap: 9px;
+        padding: 14px;
+      }
+
+      .choice.active {
+        border-color: var(--tea);
+        background: #e5eee7;
+        color: var(--tea-dark);
+        box-shadow: inset 0 0 0 1px rgba(67, 107, 91, 0.16);
+      }
+
+      .transition {
+        display: none;
+        align-items: center;
+        justify-content: center;
+        min-height: 180px;
+        border: 1px solid var(--line);
+        border-radius: 8px;
+        background: rgba(255, 250, 240, 0.68);
+        color: var(--tea-dark);
+        font-size: 20px;
+        font-weight: 900;
+      }
+
+      .transition.show {
+        display: flex;
+        animation: pageTurn 760ms ease both;
+      }
+
+      @keyframes pageTurn {
+        0% {
+          opacity: 0;
+          transform: scaleX(0.86) rotateY(-18deg);
+        }
+        60% {
+          opacity: 1;
+          transform: scaleX(1.02) rotateY(3deg);
+        }
+        100% {
+          transform: scaleX(1) rotateY(0);
+        }
+      }
+
+      .report {
+        position: relative;
+        overflow: hidden;
+        border: 1px solid rgba(162, 50, 44, 0.26);
+        border-radius: 8px;
+        background:
+          linear-gradient(135deg, rgba(162, 50, 44, 0.08), transparent 38%),
+          rgba(255, 250, 240, 0.88);
+        padding: 16px;
+      }
+
+      .seal-mark {
+        display: inline-grid;
+        width: 46px;
+        height: 46px;
+        place-items: center;
+        border: 2px solid rgba(162, 50, 44, 0.8);
+        color: var(--seal);
+        font-size: 22px;
+        font-weight: 900;
+      }
+
+      .report h2 {
+        margin: 12px 0 8px;
+        font-size: 27px;
+        line-height: 1.2;
+      }
+
+      .report p,
+      .reading p {
+        margin-bottom: 0;
+        color: var(--muted);
+        font-size: 14px;
+        line-height: 1.75;
+      }
+
+      .reading {
+        display: grid;
+        gap: 10px;
+      }
+
+      .reading article {
+        position: relative;
+        overflow: hidden;
+        border: 1px solid var(--line);
+        border-radius: 8px;
+        background:
+          linear-gradient(135deg, rgba(67, 107, 91, 0.06), transparent 42%),
+          rgba(255, 250, 240, 0.82);
+        padding: 14px;
+      }
+
+      .toast {
+        position: fixed;
+        left: 50%;
+        bottom: 22px;
+        transform: translateX(-50%) translateY(16px);
+        border-radius: 6px;
+        background: rgba(27, 26, 22, 0.94);
+        color: white;
+        padding: 10px 14px;
+        font-size: 13px;
+        opacity: 0;
+        transition: 180ms ease;
+        pointer-events: none;
+      }
+
+      .toast.show {
+        transform: translateX(-50%) translateY(0);
+        opacity: 1;
+      }
+
+      @media (max-width: 430px) {
+        .stage {
+          padding: 0;
+        }
+
+        .phone {
+          width: 100%;
+          min-height: 100vh;
+          border: 0;
+          border-radius: 0;
+        }
+      }
+    </style>
+  </head>
+  <body>
+    <div class="stage">
+      <div class="phone">
+        <div class="app">
+          <header class="topbar">
+            <div class="brand">
+              <div class="seal">相</div>
+              <span>两相知</span>
+            </div>
+            <div class="chapter" id="chapter">启卷</div>
+          </header>
+
+          <section class="screen active" id="screen-intro">
+            <div class="intro">
+              <img class="manuscript-art" src="../assets/ink-face-manuscript.png" alt="水墨面相古图" />
+              <div class="intro-content">
+                <div class="title-block">
+                  <h1>开卷观双相</h1>
+                  <p>先观眉目鼻颐之势，再问你们关系与卡点。所出皆为古籍象意，不作定命，不伤其人。</p>
+                  <button class="primary" type="button" data-next="screen-upload">启卷</button>
+                </div>
+                <div class="vertical-copy">
+                  <div class="quote">
+                    <small>《冰鉴》有云</small>
+                    <p>邪正看眼鼻，真假看嘴唇；功名看气概，富贵看精神。</p>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </section>
+
+          <section class="screen" id="screen-upload">
+            <main>
+              <section class="panel">
+                <div class="panel-head">
+                  <h2>第一卷 观形取象</h2>
+                  <span class="hint">双人照片</span>
+                </div>
+                <div class="upload-grid">
+                  <label class="upload" data-upload="self">
+                    <input data-input="self" type="file" accept="image/*" />
+                    <span>甲相</span>
+                  </label>
+                  <label class="upload" data-upload="other">
+                    <input data-input="other" type="file" accept="image/*" />
+                    <span>乙相</span>
+                  </label>
+                </div>
+                <label class="consent">
+                  <input id="consent" type="checkbox" />
+                  <span>我已获得对方同意。照片仅用于本次娱乐化相学象意解析，不用于身份识别、人脸库比对或长期保存。</span>
+                </label>
+                <div class="engine-pill">
+                  <strong>识别引擎</strong>
+                  <span>本地取点观眉、眼、鼻、口、颌之比例走势；照片不上传服务器。</span>
+                </div>
+                <div class="actions">
+                  <button class="ghost" type="button" data-next="screen-intro">返回</button>
+                  <button class="primary" id="analyze" type="button">观相成文</button>
+                </div>
+              </section>
+            </main>
+          </section>
+
+          <section class="screen" id="screen-reading">
+            <div class="oracle">
+              <div class="oracle-box">
+                <div class="ink-wheel" aria-hidden="true"></div>
+                <h2 class="oracle-title">相法推演中</h2>
+                <p class="oracle-text" id="oracleText">先定三停，以观形局。</p>
+                <p class="oracle-engine" id="engineNote">请入双相点阵，先定眉目鼻颐之界。</p>
+                <div class="scan-card focus-card scanning" data-scan-card="focus">
+                  <canvas class="scan-canvas" id="scanFocus"></canvas>
+                  <div class="scan-label"><b id="scanFocusTitle">AI 复核甲相</b><span id="scanFocusStatus">候点</span></div>
+                </div>
+                <div class="ai-phase-row" aria-label="AI 复核状态">
+                  <span id="scanRound">ROUND 01</span>
+                  <span>双相点阵</span>
+                  <span id="scanPhase">三停校准</span>
+                </div>
+                <div class="scan-grid" aria-label="面部关键点识别预览">
+                  <div class="scan-card scanning" data-scan-card="self">
+                    <canvas class="scan-canvas" id="scanSelf"></canvas>
+                    <div class="scan-label"><b>甲相取点</b><span id="scanSelfStatus">候点</span></div>
+                  </div>
+                  <div class="scan-card scanning" data-scan-card="other">
+                    <canvas class="scan-canvas" id="scanOther"></canvas>
+                    <div class="scan-label"><b>乙相取点</b><span id="scanOtherStatus">候点</span></div>
+                  </div>
+                </div>
+                <div class="oracle-steps">
+                  <div class="oracle-step active" data-oracle-step="0"><span>一</span><span>定三停：额、准、颐三界先明。</span></div>
+                  <div class="oracle-step" data-oracle-step="1"><span>二</span><span>察五官：眉尾、眼裂、鼻准、口角、颌线各归其位。</span></div>
+                  <div class="oracle-step" data-oracle-step="2"><span>三</span><span>参气色：光影只作氛围，不作吉凶定论。</span></div>
+                  <div class="oracle-step" data-oracle-step="3"><span>四</span><span>合双相：不定吉凶，只问相处之节。</span></div>
+                </div>
+              </div>
+            </div>
+          </section>
+
+          <section class="screen" id="screen-analysis">
+            <main>
+              <section class="panel">
+                <div class="panel-head">
+                  <h2>第二卷 双相小记</h2>
+                  <span class="hint">先看两人</span>
+                </div>
+                <div class="analysis" id="analysisCards"></div>
+                <div class="ask-panel">
+                  <h3>面相初诊已成</h3>
+                  <p>您是否想通过回答几个问题，获得更加针对性的关系建议？我们会把双相小记、关系类型、你的具体问题和问诊回答一起合参成签。</p>
+                  <div class="ask-actions">
+                    <button class="secondary" id="skipConsult" type="button">先快速成签</button>
+                    <button class="primary" id="startConsult" type="button">回答几问</button>
+                  </div>
+                </div>
+                <div class="actions single-action">
+                  <button class="ghost" type="button" data-next="screen-upload">重选照片</button>
+                </div>
+              </section>
+            </main>
+          </section>
+
+          <section class="screen" id="screen-relation">
+            <main>
+              <section class="panel">
+                <div class="panel-head">
+                  <h2>第三卷 你们现在是什么关系</h2>
+                  <span class="hint">定其名分</span>
+                </div>
+                <div class="choice-grid" id="relationGrid">
+                  <button class="choice active" data-relation="情侣" type="button">情侣</button>
+                  <button class="choice" data-relation="上下级" type="button">上下级</button>
+                  <button class="choice" data-relation="伙伴" type="button">伙伴</button>
+                  <button class="choice" data-relation="明星" type="button">明星</button>
+                  <button class="choice" data-relation="暧昧" type="button">暧昧</button>
+                  <button class="choice" data-relation="同事（同门）" type="button">同事（同门）</button>
+                </div>
+                <div class="transition" id="pageTurn">卷页已转，入问卡点</div>
+                <div class="actions">
+                  <button class="ghost" type="button" data-next="screen-analysis">返回相记</button>
+                  <button class="primary" id="toProblem" type="button">入下一卷</button>
+                </div>
+              </section>
+            </main>
+          </section>
+
+          <section class="screen" id="screen-problem">
+            <main>
+              <section class="panel">
+                <div class="panel-head">
+                  <h2>第四卷 你们卡在哪里</h2>
+                  <span class="hint">自述其问</span>
+                </div>
+                <div class="form-block">
+                  <label for="problemInput">请写下你们之间遇到的问题</label>
+                  <textarea id="problemInput" placeholder="例如：最近总是冷战；上级总觉得我不主动；暧昧对象忽冷忽热；同事合作时边界不清……"></textarea>
+                  <label for="needInput">你最想得到什么建议</label>
+                  <textarea id="needInput" placeholder="例如：我想知道该不该主动开口、怎么破冰、怎么设边界、怎么判断对方真实态度。"></textarea>
+                  <p class="llm-note">照片不参与后续文本合参，只使用面相术语摘要、关系类型、你的文字问题与问诊回答。</p>
+                </div>
+                <div class="actions">
+                  <button class="ghost" type="button" data-next="screen-relation">返回关系</button>
+                  <button class="primary" id="toConsult" type="button">继续问诊</button>
+                </div>
+              </section>
+            </main>
+          </section>
+
+          <section class="screen" id="screen-consult">
+            <main>
+              <section class="panel">
+                <div class="panel-head">
+                  <h2>第五卷 关系问诊</h2>
+                  <span class="hint" id="consultHint">六问合参</span>
+                </div>
+                <div class="question-list" id="questionList"></div>
+                <div class="actions">
+                  <button class="ghost" type="button" data-next="screen-problem">返回卡点</button>
+                  <button class="primary" id="generate" type="button">合参成签</button>
+                </div>
+              </section>
+            </main>
+          </section>
+
+          <section class="screen" id="screen-finalizing">
+            <div class="oracle">
+              <div class="oracle-box">
+                <div class="ink-wheel" aria-hidden="true"></div>
+                <h2 class="oracle-title">合参成签中</h2>
+                <p class="oracle-text">正在合并双相小记、关系问诊与当下卡点。</p>
+                <p class="oracle-engine">只合参非身份化摘要，不接收原始照片。</p>
+                <div class="ai-phase-row" aria-label="合参状态">
+                  <span>FACE SYMBOLS</span>
+                  <span>RELATION Q&A</span>
+                  <span>SIGN DRAFT</span>
+                </div>
+              </div>
+            </div>
+          </section>
+
+          <section class="screen" id="screen-result">
+            <main>
+              <section class="report">
+                <span class="seal-mark">合</span>
+                <h2 id="signName">山泽互照签</h2>
+                <p id="leadText"></p>
+              </section>
+
+              <section class="reading">
+                <article>
+                  <h3>双相合参</h3>
+                  <p id="combinedText"></p>
+                </article>
+                <article>
+                  <h3>矛盾成因</h3>
+                  <p id="reasonText"></p>
+                </article>
+                <article>
+                  <h3>相处建议</h3>
+                  <p id="adviceText"></p>
+                </article>
+                <article>
+                  <h3>今日破冰话</h3>
+                  <p id="iceText"></p>
+                </article>
+                <article>
+                  <h3>问诊依据</h3>
+                  <p id="basisText"></p>
+                </article>
+                <article>
+                  <h3>说明</h3>
+                  <p>以上为古籍相法术语的文化娱乐化表达，只作关系反思与沟通参考，不构成真实人格、心理、命运或关系结论。</p>
+                </article>
+              </section>
+
+              <div class="actions">
+                <button class="secondary" id="again" type="button">换一签</button>
+                <button class="ghost" type="button" data-next="screen-upload">重新开始</button>
+              </div>
+            </main>
+          </section>
+        </div>
+      </div>
+    </div>
+
+    <div class="toast" id="toast">请先确认授权</div>
+
+    <script>
+      const state = {
+        relation: "情侣",
+        problem: "",
+        need: "",
+        guided: true,
+        answers: {},
+        llmReport: null,
+        variant: 0,
+        photos: {
+          self: false,
+          other: false,
+        },
+        sources: {
+          self: "",
+          other: "",
+        },
+        analyses: [],
+        profiles: [],
+        engine: "waiting",
+      };
+
+      const MEDIAPIPE_VERSION = "0.10.35";
+      const MEDIAPIPE_MODULE_URL = `https://cdn.jsdelivr.net/npm/@mediapipe/tasks-vision@${MEDIAPIPE_VERSION}`;
+      const MEDIAPIPE_WASM_URL = `https://cdn.jsdelivr.net/npm/@mediapipe/tasks-vision@${MEDIAPIPE_VERSION}/wasm`;
+      const FACE_LANDMARKER_MODEL_URL =
+        "https://storage.googleapis.com/mediapipe-models/face_landmarker/face_landmarker/float16/latest/face_landmarker.task";
+      const LLM_PROXY_URL = window.LIANGXIANGZHI_API_URL || "http://127.0.0.1:8787/api/deepseek";
+      const READING_MIN_DURATION = 9200;
+      const FOCUS_SWAP_INTERVAL = 1150;
+      let faceLandmarkerPromise = null;
+
+      const chapters = {
+        "screen-intro": "启卷",
+        "screen-upload": "第一卷",
+        "screen-reading": "推演",
+        "screen-analysis": "第二卷",
+        "screen-relation": "第三卷",
+        "screen-problem": "第四卷",
+        "screen-consult": "第五卷",
+        "screen-finalizing": "成签",
+        "screen-result": "合参",
+      };
+
+      const relationQuestions = {
+        情侣: [
+          { question: "这次矛盾最先从哪类小事开始？", options: ["回应变慢", "语气刺痛", "承诺落空", "旧事被翻起"] },
+          { question: "冲突时你更像哪一种？", options: ["追问确认", "解释讲理", "先沉默", "转移话题"] },
+          { question: "你觉得对方最在意什么？", options: ["被回应", "被尊重", "有自由", "有安全感"] },
+          { question: "你最想调整哪件事？", options: ["沟通频率", "承诺兑现", "情绪表达", "边界距离"] },
+          { question: "你们上一次变好，靠的是什么？", options: ["主动道歉", "好好解释", "实际行动", "给彼此时间"] },
+          { question: "这次你最想得到什么结果？", options: ["修复关系", "确认态度", "设清边界", "判断是否继续"] },
+        ],
+        上下级: [
+          { question: "你们现在的卡点更像什么？", options: ["目标不清", "授权不足", "反馈过重", "成果不被看见"] },
+          { question: "对方更看重什么？", options: ["结果", "过程", "态度", "风险控制"] },
+          { question: "你最怕发生什么？", options: ["被否定", "被控制", "被忽视", "责任不清"] },
+          { question: "沟通最容易卡在哪里？", options: ["指令模糊", "临时变化", "语气压力", "汇报断层"] },
+          { question: "你最希望得到什么？", options: ["明确指令", "更大自主权", "更多认可", "更少临时变化"] },
+          { question: "如果先改一个动作，你选什么？", options: ["汇报方式", "预期管理", "边界表达", "交付节奏"] },
+        ],
+        伙伴: [
+          { question: "你们的伙伴关系更偏哪类？", options: ["事业合作", "项目推进", "创作搭档", "长期支持"] },
+          { question: "目前最大卡点是什么？", options: ["分工", "收益", "节奏", "信任"] },
+          { question: "你们的差异更像哪种？", options: ["结果 vs 感受", "速度 vs 稳定", "主导 vs 配合", "规则 vs 弹性"] },
+          { question: "最容易让你不平衡的是？", options: ["付出不均", "话语权不均", "责任不清", "认可不足"] },
+          { question: "你希望关系下一步怎样？", options: ["继续深化", "重新分工", "暂停观察", "讲清规则"] },
+          { question: "过去最顺时靠的是什么？", options: ["互相信任", "分工清楚", "目标一致", "彼此补位"] },
+        ],
+        明星: [
+          { question: "这段关系更像哪种？", options: ["粉丝陪伴", "内容共鸣", "商务合作", "情感投射"] },
+          { question: "最困扰你的是？", options: ["距离感", "比较心", "舆论压力", "投入过多"] },
+          { question: "你希望获得哪类建议？", options: ["边界建议", "情绪安放", "合作判断", "节奏调整"] },
+          { question: "你对回应的期待更接近哪种？", options: ["不期待回应", "期待公开互动", "期待私下回应", "不确定"] },
+          { question: "最近影响最大的是？", options: ["生活节奏", "消费投入", "社交状态", "情绪起伏"] },
+          { question: "最后建议你希望偏向？", options: ["理性降温", "继续支持", "合作沟通", "自我保护"] },
+        ],
+        暧昧: [
+          { question: "你们现在最明显的暧昧信号是？", options: ["频繁聊天", "身体/眼神靠近", "特殊称呼", "只在某些时刻热"] },
+          { question: "最让你不安的是？", options: ["忽冷忽热", "不推进关系", "回避明确", "对别人也类似"] },
+          { question: "你更想要什么？", options: ["确认关系", "保持观察", "体面退出", "看清动机"] },
+          { question: "你最怕自己显得怎样？", options: ["太主动", "太被动", "太认真", "太好拿捏"] },
+          { question: "最近一次强烈波动来自？", options: ["一句话", "一次见面", "一次失联", "第三方信息"] },
+          { question: "你希望推进方式偏哪类？", options: ["温柔", "直接", "轻试探", "设边界"] },
+        ],
+        "同事（同门）": [
+          { question: "你们关系更像哪种？", options: ["同事协作", "同门竞争", "师门关系", "临时搭档"] },
+          { question: "当前卡点更像什么？", options: ["资源分配", "功劳归属", "沟通语气", "边界不清"] },
+          { question: "你觉得对方更重什么？", options: ["规则", "效率", "人情", "资历"] },
+          { question: "你最不方便直接说的是？", options: ["被占用时间", "被抢功劳", "被比较", "被越界"] },
+          { question: "你希望建议帮你做什么？", options: ["争取权益", "缓和气氛", "提前避坑", "设清边界"] },
+          { question: "长期共处最需要哪条规则？", options: ["分工明确", "功劳说清", "沟通留痕", "边界固定"] },
+        ],
+      };
+
+      const faceTypeCatalog = [
+        {
+          key: "warmHost",
+          code: "R-E-S-O",
+          name: "嘴替书生",
+          portraitPosition: "0% 0%",
+          historicalFigure: "苏轼",
+          tagline: "圆融有应，言路舒开，适合把冷场救回人间。",
+          historicalCue: "取其画像中舒朗亲和、眉目有笑的文士气。",
+          publicCue: "分享感：一开口就像给尴尬递了台阶。",
+          axes: ["圆融轮廓", "目神回应", "中庭稳", "表达开"],
+        },
+        {
+          key: "teaBuffer",
+          code: "R-E-S-I",
+          name: "慢热高僧",
+          portraitPosition: "33.333% 0%",
+          historicalFigure: "玄奘",
+          tagline: "面气温缓，眼神能接，擅长把炸点泡成温水。",
+          historicalCue: "取其画像中静定、收敛、先听后言之相。",
+          publicCue: "分享感：不抢话，但一句话能让场面降温。",
+          axes: ["圆融轮廓", "目神回应", "中庭稳", "表达藏"],
+        },
+        {
+          key: "lampKeeper",
+          code: "R-M-S-O",
+          name: "排班谋士",
+          portraitPosition: "66.666% 0%",
+          historicalFigure: "张良",
+          tagline: "眉势有章，脸相有和，热心但喜欢事情有流程。",
+          historicalCue: "取其画像中雅正、审时、善定节奏的谋士气。",
+          publicCue: "分享感：嘴上说都行，手里已经排好了流程。",
+          axes: ["圆融轮廓", "眉骨章法", "中庭稳", "表达开"],
+        },
+        {
+          key: "bambooStrategist",
+          code: "G-M-S-I",
+          name: "憋招军师",
+          portraitPosition: "100% 0%",
+          historicalFigure: "诸葛亮",
+          tagline: "骨线清，眉意深，话不多但心里已经画完三版方案。",
+          historicalCue: "取其画像中清骨、远虑、谋定后动之相。",
+          publicCue: "分享感：表面风平浪静，脑内已开三场会。",
+          axes: ["骨线清", "眉骨章法", "中庭稳", "表达藏"],
+        },
+        {
+          key: "swiftPioneer",
+          code: "G-M-F-O",
+          name: "硬控将军",
+          portraitPosition: "0% 100%",
+          historicalFigure: "岳飞",
+          tagline: "眉峰带劲，行动带风，最怕事情卡在原地打转。",
+          historicalCue: "取其画像中正直、劲挺、骨气外显的将帅气。",
+          publicCue: "分享感：一进场就想把问题推进到下一步。",
+          axes: ["骨线清", "眉骨章法", "灵动快", "表达开"],
+        },
+        {
+          key: "flashRelay",
+          code: "G-E-F-O",
+          name: "秒懂剑客",
+          portraitPosition: "33.333% 100%",
+          historicalFigure: "荆轲",
+          tagline: "眼神反应快，情绪雷达灵，消息已读不回会被立刻捕捉。",
+          historicalCue: "取其画像中锋利、敏捷、临场反应快的剑客气。",
+          publicCue: "分享感：别人还在加载，你已经读到潜台词。",
+          axes: ["骨线清", "目神回应", "灵动快", "表达开"],
+        },
+        {
+          key: "cloudObserver",
+          code: "R-M-F-I",
+          name: "走神行者",
+          portraitPosition: "66.666% 100%",
+          historicalFigure: "徐霞客",
+          tagline: "看起来随和，心里有秤；不急着说，但都在记录。",
+          historicalCue: "取其画像中独行、观微、边走边校准的行者气。",
+          publicCue: "分享感：人在局里，心已经把地图画完了。",
+          axes: ["圆融轮廓", "眉骨章法", "灵动快", "表达藏"],
+        },
+        {
+          key: "mirrorCalibrator",
+          code: "G-E-S-I",
+          name: "边界镖客",
+          portraitPosition: "100% 100%",
+          historicalFigure: "班超",
+          tagline: "目神有应，边界清醒，热闹可以有，但别乱进我结界。",
+          historicalCue: "取其画像中守界、决断、远行不乱的使者气。",
+          publicCue: "分享感：可以并肩赶路，但路线要先说清。",
+          axes: ["骨线清", "目神回应", "中庭稳", "表达藏"],
+        },
+      ];
+
+      const physiognomyRules = {
+        brow: [
+          {
+            when: (m) => (m.brow.tailLift || 0) > 0.014 && (m.brow.browEyeGap || 0) > 0.08,
+            term: "眉势",
+            name: "眉尾舒扬，天仓气开",
+            text: "关键点见眉尾较舒，眉眼之间留气；古法取其“眉不压目、势有清扬”。象意为表达愿意向外打开，但仍需被尊重节奏。",
+            weights: { expression: 12, response: 9, softness: 4 },
+          },
+          {
+            when: (m) => (m.brow.archHeight || 0) > 0.011 && m.brow.symmetry > 0.74,
+            term: "眉骨",
+            name: "眉弓有伏，左右相承",
+            text: "关键点见眉弓起伏有序，左右差不过甚；古法取“骨伏其下，气行其上”。象意为遇事有主见，也会顾及体面。",
+            weights: { order: 14, boundary: 7, expression: 4 },
+          },
+          {
+            when: (m) => m.brow.edge > 31 && m.brow.symmetry > 0.72,
+            term: "眉势",
+            name: "眉骨有序，清扬入鬓",
+            text: "眉区纹理有聚而左右相应，古法取其“清而不散”；象意为遇事先立章法，重体面与分寸。",
+            weights: { order: 16, expression: 7, response: 3 },
+          },
+          {
+            when: (m) => m.brow.edge > 31,
+            term: "眉势",
+            name: "眉峰见势，气有外达",
+            text: "眉区起伏较明，取其“有锋有势”；象意为反应较快，情绪来时不愿长期压住。",
+            weights: { expression: 17, boundary: 6 },
+          },
+          {
+            when: (m) => m.brow.brightness > 150,
+            term: "眉宇",
+            name: "眉宇开舒，气路较朗",
+            text: "眉眼上停明度较开，取其“气路舒展”；象意为愿意把话说开，不喜久悬不决。",
+            weights: { response: 9, expression: 8 },
+          },
+          {
+            when: () => true,
+            term: "眉势",
+            name: "眉气含敛，藏而不露",
+            text: "眉区气息较收，取其“藏神守势”；象意为重要关系中会先观察，再决定如何表达。",
+            weights: { order: 8, boundary: 10 },
+          },
+        ],
+        eye: [
+          {
+            when: (m) => (m.eye.openness || 0) > 0.245 && (m.eye.eyeGapRatio || 0) > 0.24,
+            term: "目神",
+            name: "目宫开阔，神采外应",
+            text: "关键点见眼裂开合较明，内眦之间有度；古法取“目开而神应”。象意为关系里重即时反馈，冷处理容易被读成疏远。",
+            weights: { response: 20, expression: 7 },
+          },
+          {
+            when: (m) => (m.eye.tiltBalance || 0) > 0.72 && m.eye.contrast > 36,
+            term: "目势",
+            name: "两目平参，神不偏欹",
+            text: "关键点见双目倾势相近，眼区明暗有聚；古法取“神定则气平”。象意为能听见道理，但需要对话先稳住情绪。",
+            weights: { order: 10, response: 11, softness: 3 },
+          },
+          {
+            when: (m) => m.eye.contrast > 48,
+            term: "目神",
+            name: "目神有聚，光不外散",
+            text: "眼区明暗对照较足，古法取“神聚”；象意为对回应敏锐，能很快察觉关系气氛变化。",
+            weights: { response: 18, expression: 4 },
+          },
+          {
+            when: (m) => m.eye.brightness > 145,
+            term: "目光",
+            name: "目光含润，神气温和",
+            text: "眼区明度较柔，取其“润而不浮”；象意为更吃软话，沟通里需要先被安放。",
+            weights: { response: 16, softness: 8 },
+          },
+          {
+            when: () => true,
+            term: "目气",
+            name: "神光内藏，观而后动",
+            text: "眼区气息偏收，取其“神藏”；象意为不急于表态，但心里会反复推敲对方的态度。",
+            weights: { order: 9, boundary: 6 },
+          },
+        ],
+        nose: [
+          {
+            when: (m) => (m.nose.bridgeRatio || 0) > 1.28 && (m.nose.bridgeBalance || 0) > 0.66,
+            term: "山根鼻梁",
+            name: "山根有承，年寿成线",
+            text: "关键点见山根至准头一线较顺，鼻翼宽窄与中停相称；古法借“山根、年寿”观承接。象意为重兑现与次序，喜欢事情有来龙去脉。",
+            weights: { order: 16, stability: 15 },
+          },
+          {
+            when: (m) => (m.nose.widthRatio || 0) > 0.28 && (m.nose.bridgeBalance || 0) > 0.58,
+            term: "鼻准",
+            name: "准头有容，中停不促",
+            text: "关键点见准翼横幅有承，鼻线不急不促；古法取“准有容而气能纳”。象意为愿意承担现实问题，但不喜被逼着即时表态。",
+            weights: { stability: 16, softness: 5, boundary: 5 },
+          },
+          {
+            when: (m) => m.nose.centerLift > 10,
+            term: "鼻峰",
+            name: "山根承起，鼻峰有脊",
+            text: "中停中央明度高于两侧，取“山根承起、峰脊有承”；象意为遇事先权衡轻重，重实际兑现。",
+            weights: { order: 14, stability: 13 },
+          },
+          {
+            when: (m) => m.nose.contrast > 42,
+            term: "鼻准",
+            name: "准头有收，中停见主",
+            text: "鼻区轮廓对照较明，取其“准而不浮”；象意为关系中重确定感，喜欢话有落处。",
+            weights: { stability: 12, boundary: 9 },
+          },
+          {
+            when: () => true,
+            term: "中停",
+            name: "鼻气平和，主次可辨",
+            text: "中停明暗较匀，取其“平而有序”；象意为适合把复杂问题拆开，一件一件谈。",
+            weights: { order: 8, stability: 7 },
+          },
+        ],
+        wing: [
+          {
+            when: (m) => (m.wing.wingSymmetry || 0) > 0.78 && (m.wing.widthRatio || 0) > 0.22,
+            term: "兰台廷尉",
+            name: "左右辅鼻，收放相齐",
+            text: "关键点见鼻翼左右开合相近，辅准有度；古法称兰台、廷尉，以观收纳。象意为安全感来自稳定回应与可预期行动。",
+            weights: { stability: 14, response: 8 },
+          },
+          {
+            when: (m) => (m.wing.widthRatio || 0) < 0.2 && (m.wing.wingSymmetry || 0) > 0.66,
+            term: "鼻翼",
+            name: "辅翼内敛，守而后开",
+            text: "关键点见鼻翼开幅较收；古法取“敛则重守”。象意为关系里会先保留边界，确定安全后才愿意放松。",
+            weights: { boundary: 15, order: 5 },
+          },
+          {
+            when: (m) => m.wing.symmetry > 0.78,
+            term: "兰台廷尉",
+            name: "兰台廷尉，开合有度",
+            text: "鼻翼两侧明暗较均，古法借兰台、廷尉观收放；象意为安全感来自稳定回应与可预期行动。",
+            weights: { stability: 11, response: 7 },
+          },
+          {
+            when: () => true,
+            term: "鼻翼",
+            name: "鼻翼一张一敛，收放相参",
+            text: "鼻翼两侧气息有开合差，取其“张敛相参”；象意为一边想靠近，一边又需要边界。",
+            weights: { boundary: 12, response: 5 },
+          },
+        ],
+        mouth: [
+          {
+            when: (m) => (m.mouth.cornerBalance || 0) > 0.82 && (m.mouth.widthRatio || 0) > 0.31,
+            term: "口势",
+            name: "口角平承，言路有矩",
+            text: "关键点见两口角高低相近，口势开合有度；《冰鉴》言“真假看嘴唇”，此处只取表达象意。象意为重说话是否算数，也在意对方语气。",
+            weights: { order: 8, stability: 8, response: 6 },
+          },
+          {
+            when: (m) => (m.mouth.openness || 0) > 0.045,
+            term: "唇气",
+            name: "唇气外开，话意易出",
+            text: "关键点见唇部开合较明；古法取“口为出纳之门”。象意为情绪满时容易先说出口，宜给语言留一息余地。",
+            weights: { expression: 13, response: 5 },
+          },
+          {
+            when: () => true,
+            term: "口气",
+            name: "口势含蓄，言藏其后",
+            text: "口部开合偏收，取其“言有所守”。象意为不一定马上说清，但会用沉默衡量关系温度。",
+            weights: { boundary: 7, order: 6 },
+          },
+        ],
+        jaw: [
+          {
+            when: (m) => (m.jaw.chinCenter || 0) > 0.8 && (m.jaw.taper || 0) > 0.58,
+            term: "地阁",
+            name: "地阁正承，下停有归",
+            text: "关键点见下颌收束与颐部居中较稳；古法以下停观承接。象意为重长期、重结果，关系里希望承诺不只停在话上。",
+            weights: { stability: 18, boundary: 9 },
+          },
+          {
+            when: (m) => (m.jaw.taper || 0) < 0.55 && (m.jaw.chinCenter || 0) > 0.66,
+            term: "颐颌",
+            name: "颐颌内收，柔中带守",
+            text: "关键点见颌线偏收，颐部仍有中正；古法取“收而不散”。象意为愿意修复，但需要先感到被好好对待。",
+            weights: { softness: 14, response: 7, boundary: 4 },
+          },
+          {
+            when: (m) => m.jaw.edge > 27 && m.jaw.symmetry > 0.7,
+            term: "地阁",
+            name: "地阁有托，下停稳承",
+            text: "下停边缘有承托感，取其“地阁有托”；象意为重长期兑现，越认真越希望规则清楚。",
+            weights: { stability: 16, boundary: 12 },
+          },
+          {
+            when: (m) => m.jaw.brightness > 135,
+            term: "颐颌",
+            name: "颐线柔应，承中带和",
+            text: "颐颌明度较柔，取其“柔中有承”；象意为愿意修复关系，但需要对方先给台阶。",
+            weights: { softness: 12, response: 9 },
+          },
+          {
+            when: () => true,
+            term: "下停",
+            name: "下停含蓄，守而后言",
+            text: "下停气息偏敛，取其“守势”；象意为遇到矛盾时容易先忍住，再慢慢表达。",
+            weights: { boundary: 8, order: 7 },
+          },
+        ],
+        aura: [
+          {
+            when: (m) => (m.face?.threeBalance || 0) > 0.74 && m.overall.contrast < 62,
+            term: "三停",
+            name: "三停相称，形局有序",
+            text: "关键点以上停、中停、下停合参，比例不偏；古法先定三停，再察五官。象意为适合把矛盾拆清，不必急着给关系定性。",
+            weights: { order: 11, stability: 8, softness: 3 },
+          },
+          {
+            when: (m) => m.overall.brightness > 145 && m.overall.contrast < 54,
+            term: "气色",
+            name: "气色清和，墨淡有光",
+            text: "全图明度较和，反差不过烈；象意为更适合温和开局，不宜用逼问打开对话。",
+            weights: { softness: 10, response: 5 },
+          },
+          {
+            when: (m) => m.overall.contrast > 58,
+            term: "气势",
+            name: "气势有骨，墨分轻重",
+            text: "全图明暗反差较足，取其“有骨有势”；象意为情绪推动力强，宜先降温再判断。",
+            weights: { expression: 12, boundary: 5 },
+          },
+          {
+            when: () => true,
+            term: "气息",
+            name: "气息敛静，宜缓宜问",
+            text: "整体气息偏静，取其“敛而不散”；象意为适合慢问，不适合逼迫即时回应。",
+            weights: { order: 5, softness: 7 },
+          },
+        ],
+      };
+
+      const reports = [
+        {
+          sign: "山泽互照签",
+          lead: "甲相重定，乙相重应；一主收束，一主感通。相遇不是相冲，是节候未齐。",
+          combined: "甲相眉势清扬、鼻准有收，象在章法与承诺；乙相目神含光、颐线柔应，象在感受与回应。两相合参，最怕一方以沉默守稳，另一方以追问求安。",
+          reason: "此类矛盾常起于节奏错位：重定者先想把事理捋顺，重应者先想确认自己被看见。于是一个越静，一个越急，误会便在中间生根。",
+          advice: "先安神，再论事。甲方宜少用沉默作缓冲，给一句明确回应；乙方宜少用连问试探，先说真实需要。把问题缩小到一件事，关系会松下来。",
+          ice: "我不是要你马上给答案，我只是想先确认，我们还站在同一边。",
+        },
+        {
+          sign: "水木相生签",
+          lead: "一人如水，善感其微；一人如木，重其生发。此局宜缓，不宜逼。",
+          combined: "一方眉眼见灵，容易捕捉细节；一方颐颌有托，倾向用行动证明心意。古法所谓神形相济，放在关系里，就是感受与行动需要互译。",
+          reason: "矛盾多不是无情，而是表达路径不同。一个等待一句软话，一个以为已经做了很多；若无人翻译，善意也会变成委屈。",
+          advice: "把暗示改成明说，把补偿改成确认。今天先不翻旧账，只各说一件自己真正需要的事。",
+          ice: "我知道你也有你的方式，但我想把我的感受说清楚，别让我们互相猜。",
+        },
+        {
+          sign: "风火相激签",
+          lead: "眉目有锋，气势相催；有吸引，也有相激。火可照人，也可灼人。",
+          combined: "两相皆有外发之势，眉峰与目神皆不弱，象在反应快、在意深、话语容易带锋。相合时很有热度，相争时也容易越界。",
+          reason: "矛盾常起于情绪比语言更快。一方一句气话，另一方立即接招，最后争的不是原问题，而是谁更被伤到。",
+          advice: "设一个暂停词。任一方说出后，双方停十分钟，只保留一个议题，不在同一场对话里清算全部旧事。",
+          ice: "我现在情绪有点满，想先停一下，不是逃避，是不想用气话伤到我们。",
+        },
+        {
+          sign: "金水相照签",
+          lead: "金主规矩，水主流通。规矩若明，流通自安；规矩若暗，便生牵扯。",
+          combined: "一方鼻准与颐颌偏重收束，象在原则；一方眉眼与口气偏重流动，象在弹性。两相并非相背，关键在边界是否先讲明。",
+          reason: "卡点多来自默认规则不同。一个以为理所当然，一个以为还能商量；不明说时，双方都会觉得对方越线。",
+          advice: "不要先追究态度，先列边界。各写三条不能接受、三条可以调整，再讨论共同规则。",
+          ice: "我们先别判断谁对谁错，能不能把各自的边界说清楚一点？",
+        },
+      ];
+
+      function showToast(message) {
+        const toast = document.getElementById("toast");
+        toast.textContent = message;
+        toast.classList.add("show");
+        window.setTimeout(() => toast.classList.remove("show"), 1700);
+      }
+
+      function showScreen(id) {
+        document.querySelectorAll(".screen").forEach((screen) => {
+          screen.classList.toggle("active", screen.id === id);
+        });
+        document.getElementById("chapter").textContent = chapters[id] || "两相知";
+      }
+
+      function setActive(selector, key, value) {
+        document.querySelectorAll(selector).forEach((button) => {
+          button.classList.toggle("active", button.dataset[key] === value);
+        });
+      }
+
+      function clamp(value, min, max) {
+        return Math.max(min, Math.min(max, value));
+      }
+
+      function loadImage(src) {
+        return new Promise((resolve, reject) => {
+          const image = new Image();
+          image.onload = () => resolve(image);
+          image.onerror = reject;
+          image.src = src;
+        });
+      }
+
+      function wait(ms) {
+        return new Promise((resolve) => window.setTimeout(resolve, ms));
+      }
+
+      function makeAnalysisError(code) {
+        const error = new Error(code);
+        error.code = code;
+        return error;
+      }
+
+      async function createFacePointModel(FaceLandmarker, vision, delegate) {
+        return FaceLandmarker.createFromOptions(vision, {
+          baseOptions: {
+            modelAssetPath: FACE_LANDMARKER_MODEL_URL,
+            delegate,
+          },
+          runningMode: "IMAGE",
+          numFaces: 2,
+          outputFaceBlendshapes: false,
+          outputFacialTransformationMatrixes: false,
+        });
+      }
+
+      async function getFaceLandmarker() {
+        if (!faceLandmarkerPromise) {
+          faceLandmarkerPromise = (async () => {
+            const { FaceLandmarker, FilesetResolver } = await import(MEDIAPIPE_MODULE_URL);
+            const vision = await FilesetResolver.forVisionTasks(MEDIAPIPE_WASM_URL);
+            try {
+              return await createFacePointModel(FaceLandmarker, vision, "GPU");
+            } catch (error) {
+              return createFacePointModel(FaceLandmarker, vision, "CPU");
+            }
+          })().catch((error) => {
+            faceLandmarkerPromise = null;
+            throw error;
+          });
+        }
+        return faceLandmarkerPromise;
+      }
+
+      function regionStats(gray, width, height, box) {
+        const x0 = Math.floor(box.x * width);
+        const y0 = Math.floor(box.y * height);
+        const x1 = Math.floor((box.x + box.w) * width);
+        const y1 = Math.floor((box.y + box.h) * height);
+        let count = 0;
+        let sum = 0;
+        let sumSq = 0;
+        let edge = 0;
+        let leftSum = 0;
+        let rightSum = 0;
+        let leftCount = 0;
+        let rightCount = 0;
+        const middle = (x0 + x1) / 2;
+
+        for (let y = y0 + 1; y < y1 - 1; y += 1) {
+          for (let x = x0 + 1; x < x1 - 1; x += 1) {
+            const index = y * width + x;
+            const value = gray[index];
+            const gx = Math.abs(value - gray[index - 1]) + Math.abs(value - gray[index + 1]);
+            const gy = Math.abs(value - gray[index - width]) + Math.abs(value - gray[index + width]);
+            count += 1;
+            sum += value;
+            sumSq += value * value;
+            edge += (gx + gy) / 2;
+            if (x < middle) {
+              leftSum += value;
+              leftCount += 1;
+            } else {
+              rightSum += value;
+              rightCount += 1;
+            }
+          }
+        }
+
+        const brightness = sum / count;
+        const variance = sumSq / count - brightness * brightness;
+        const left = leftSum / Math.max(1, leftCount);
+        const right = rightSum / Math.max(1, rightCount);
+        return {
+          brightness,
+          contrast: Math.sqrt(Math.max(0, variance)),
+          edge: edge / count,
+          symmetry: clamp(1 - Math.abs(left - right) / 42, 0, 1),
+        };
+      }
+
+      function getPixelMetrics(image) {
+        const canvas = document.createElement("canvas");
+        const width = 120;
+        const height = 160;
+        canvas.width = width;
+        canvas.height = height;
+        const context = canvas.getContext("2d", { willReadFrequently: true });
+        context.drawImage(image, 0, 0, width, height);
+        const pixels = context.getImageData(0, 0, width, height).data;
+        const gray = new Array(width * height);
+        for (let i = 0; i < gray.length; i += 1) {
+          const offset = i * 4;
+          gray[i] = pixels[offset] * 0.299 + pixels[offset + 1] * 0.587 + pixels[offset + 2] * 0.114;
+        }
+
+        const brow = regionStats(gray, width, height, { x: 0.18, y: 0.24, w: 0.64, h: 0.18 });
+        const eye = regionStats(gray, width, height, { x: 0.16, y: 0.29, w: 0.68, h: 0.2 });
+        const nose = regionStats(gray, width, height, { x: 0.31, y: 0.43, w: 0.38, h: 0.24 });
+        const wing = regionStats(gray, width, height, { x: 0.22, y: 0.52, w: 0.56, h: 0.18 });
+        const jaw = regionStats(gray, width, height, { x: 0.2, y: 0.68, w: 0.6, h: 0.22 });
+        const overall = regionStats(gray, width, height, { x: 0.08, y: 0.08, w: 0.84, h: 0.84 });
+        const noseCenter = regionStats(gray, width, height, { x: 0.43, y: 0.42, w: 0.14, h: 0.24 });
+        const noseSide = regionStats(gray, width, height, { x: 0.25, y: 0.42, w: 0.5, h: 0.24 });
+        nose.centerLift = noseCenter.brightness - noseSide.brightness;
+        const mouth = regionStats(gray, width, height, { x: 0.24, y: 0.58, w: 0.52, h: 0.15 });
+
+        return { brow, eye, nose, wing, jaw, mouth, overall };
+      }
+
+      function landmark(landmarks, index) {
+        return landmarks[index] || { x: 0, y: 0, z: 0 };
+      }
+
+      function averagePoint(landmarks, indexes) {
+        const total = indexes.reduce(
+          (sum, index) => {
+            const point = landmark(landmarks, index);
+            sum.x += point.x;
+            sum.y += point.y;
+            sum.z += point.z || 0;
+            return sum;
+          },
+          { x: 0, y: 0, z: 0 },
+        );
+        return {
+          x: total.x / indexes.length,
+          y: total.y / indexes.length,
+          z: total.z / indexes.length,
+        };
+      }
+
+      function distance(a, b) {
+        return Math.hypot(a.x - b.x, a.y - b.y);
+      }
+
+      function safeRatio(value, base, fallback = 0) {
+        return Math.abs(base) > 0.00001 ? value / base : fallback;
+      }
+
+      function percent(value) {
+        return Math.round(clamp(value, 0, 1) * 100);
+      }
+
+      const scanSlots = {
+        self: {
+          canvas: "scanSelf",
+          status: "scanSelfStatus",
+        },
+        other: {
+          canvas: "scanOther",
+          status: "scanOtherStatus",
+        },
+        focus: {
+          canvas: "scanFocus",
+          status: "scanFocusStatus",
+        },
+      };
+
+      const scanRuntime = {
+        focusIndex: 0,
+        focusTimer: null,
+        frames: {
+          self: null,
+          other: null,
+        },
+      };
+
+      const featurePaths = [
+        [10, 338, 297, 332, 284, 251, 389, 356, 454, 323, 361, 288, 397, 365, 379, 378, 400, 377, 152, 148, 176, 149, 150, 136, 172, 58, 132, 93, 234, 127, 162, 21, 54, 103, 67, 109, 10],
+        [70, 63, 105, 66, 107],
+        [336, 296, 334, 293, 300],
+        [33, 160, 158, 133, 153, 144, 33],
+        [362, 385, 387, 263, 373, 380, 362],
+        [168, 6, 197, 195, 5, 4, 1, 2],
+        [98, 97, 2, 326, 327],
+        [61, 146, 91, 181, 84, 17, 314, 405, 321, 375, 291],
+        [172, 136, 150, 149, 176, 148, 152, 377, 400, 378, 379, 365, 397],
+      ];
+
+      function setScanStatus(slot, text, scanning = true) {
+        const config = scanSlots[slot];
+        if (!config) return;
+        const status = document.getElementById(config.status);
+        const card = document.querySelector(`[data-scan-card="${slot}"]`);
+        if (status) status.textContent = text;
+        if (card) card.classList.toggle("scanning", scanning);
+      }
+
+      function cloneScanMetrics(metrics) {
+        if (!metrics?.scanGuides) return null;
+        return {
+          scanGuides: { ...metrics.scanGuides },
+        };
+      }
+
+      function rememberScanFrame(slot, image, landmarks, metrics, statusText) {
+        if (slot !== "self" && slot !== "other") return;
+        scanRuntime.frames[slot] = {
+          image,
+          landmarks: landmarks ? landmarks.map((point) => ({ x: point.x, y: point.y, z: point.z || 0 })) : null,
+          metrics: cloneScanMetrics(metrics),
+          statusText,
+        };
+      }
+
+      function fitImageToCanvas(canvas, image) {
+        const rect = canvas.getBoundingClientRect();
+        const ratio = window.devicePixelRatio || 1;
+        const cssWidth = Math.max(120, Math.round(rect.width || 150));
+        const cssHeight = Math.max(160, Math.round(rect.height || 200));
+        canvas.width = Math.round(cssWidth * ratio);
+        canvas.height = Math.round(cssHeight * ratio);
+        const scale = Math.min(canvas.width / image.naturalWidth, canvas.height / image.naturalHeight);
+        const width = image.naturalWidth * scale;
+        const height = image.naturalHeight * scale;
+        return {
+          x: (canvas.width - width) / 2,
+          y: (canvas.height - height) / 2,
+          width,
+          height,
+        };
+      }
+
+      function drawInkFrame(context, canvas) {
+        context.fillStyle = "#f7f1e4";
+        context.fillRect(0, 0, canvas.width, canvas.height);
+        context.strokeStyle = "rgba(154, 116, 46, 0.28)";
+        context.lineWidth = 1;
+        for (let x = 0; x < canvas.width; x += 28) {
+          context.beginPath();
+          context.moveTo(x, 0);
+          context.lineTo(x, canvas.height);
+          context.stroke();
+        }
+        for (let y = 0; y < canvas.height; y += 28) {
+          context.beginPath();
+          context.moveTo(0, y);
+          context.lineTo(canvas.width, y);
+          context.stroke();
+        }
+      }
+
+      function mapLandmark(point, rect) {
+        return {
+          x: rect.x + point.x * rect.width,
+          y: rect.y + point.y * rect.height,
+        };
+      }
+
+      function drawFeaturePath(context, landmarks, rect, indexes, color, width) {
+        context.beginPath();
+        indexes.forEach((index, offset) => {
+          const point = landmarks[index];
+          if (!point) return;
+          const mapped = mapLandmark(point, rect);
+          if (offset === 0) context.moveTo(mapped.x, mapped.y);
+          else context.lineTo(mapped.x, mapped.y);
+        });
+        context.strokeStyle = color;
+        context.lineWidth = width;
+        context.stroke();
+      }
+
+      function drawScanGuides(context, metrics, rect) {
+        const guides = metrics?.scanGuides;
+        if (!guides) return;
+        const guideItems = [
+          ["上停", guides.faceTopY],
+          ["眉界", guides.browY],
+          ["准界", guides.noseBaseY],
+          ["地阁", guides.chinY],
+        ];
+        context.save();
+        context.font = `${Math.max(11, rect.width * 0.045)}px "Songti SC", serif`;
+        context.lineWidth = 1;
+        guideItems.forEach(([label, yValue], index) => {
+          const y = rect.y + yValue * rect.height;
+          context.strokeStyle = index === 0 || index === guideItems.length - 1 ? "rgba(154, 116, 46, 0.52)" : "rgba(47, 143, 145, 0.62)";
+          context.setLineDash([5, 5]);
+          context.beginPath();
+          context.moveTo(rect.x + rect.width * 0.12, y);
+          context.lineTo(rect.x + rect.width * 0.88, y);
+          context.stroke();
+          context.setLineDash([]);
+          context.fillStyle = "rgba(255, 250, 240, 0.86)";
+          context.fillRect(rect.x + rect.width * 0.12, y - 13, 34, 16);
+          context.fillStyle = "#264c42";
+          context.fillText(label, rect.x + rect.width * 0.13, y - 1);
+        });
+        context.restore();
+      }
+
+      function drawFaceScan(slot, image, landmarks, metrics, statusText = "取点中", options = {}) {
+        const config = scanSlots[slot];
+        if (!config) return;
+        const canvas = document.getElementById(config.canvas);
+        if (!canvas) return;
+        const context = canvas.getContext("2d");
+        if (!context) return;
+        const rect = fitImageToCanvas(canvas, image);
+        drawInkFrame(context, canvas);
+        context.drawImage(image, rect.x, rect.y, rect.width, rect.height);
+        context.fillStyle = "rgba(27, 26, 22, 0.2)";
+        context.fillRect(rect.x, rect.y, rect.width, rect.height);
+
+        if (landmarks?.length) {
+          drawScanGuides(context, metrics, rect);
+          featurePaths.forEach((path, index) => {
+            drawFeaturePath(
+              context,
+              landmarks,
+              rect,
+              path,
+              index < 1 ? "rgba(255, 250, 240, 0.76)" : "rgba(47, 143, 145, 0.9)",
+              index < 1 ? 1.2 : 1.6,
+            );
+          });
+          landmarks.forEach((point, index) => {
+            if (index % 3 !== 0) return;
+            const mapped = mapLandmark(point, rect);
+            context.beginPath();
+            context.arc(mapped.x, mapped.y, Math.max(1.2, rect.width * 0.006), 0, Math.PI * 2);
+            context.fillStyle = index % 9 === 0 ? "rgba(154, 116, 46, 0.92)" : "rgba(255, 250, 240, 0.86)";
+            context.fill();
+          });
+          setScanStatus(slot, statusText, false);
+        } else {
+          context.strokeStyle = "rgba(47, 143, 145, 0.6)";
+          context.lineWidth = 1;
+          context.strokeRect(rect.x + rect.width * 0.18, rect.y + rect.height * 0.16, rect.width * 0.64, rect.height * 0.68);
+          setScanStatus(slot, statusText, true);
+        }
+        if (options.remember !== false) {
+          rememberScanFrame(slot, image, landmarks, metrics, statusText);
+        }
+      }
+
+      function setFocusTitle(slot) {
+        const title = document.getElementById("scanFocusTitle");
+        if (!title) return;
+        title.textContent = slot === "self" ? "AI 复核甲相" : "AI 复核乙相";
+      }
+
+      function pulseFocusCard() {
+        const card = document.querySelector('[data-scan-card="focus"]');
+        if (!card) return;
+        card.classList.remove("switching");
+        void card.offsetWidth;
+        card.classList.add("switching");
+      }
+
+      function renderFocusScan() {
+        const order = ["self", "other"];
+        const slot = order[scanRuntime.focusIndex % order.length];
+        const frame = scanRuntime.frames[slot];
+        if (!frame) return;
+        const phases = ["三停校准", "眉眼取势", "鼻准复核", "地阁合参", "双相联算"];
+        const round = Math.floor(scanRuntime.focusIndex / order.length) + 1;
+        const roundNode = document.getElementById("scanRound");
+        const phaseNode = document.getElementById("scanPhase");
+        if (roundNode) roundNode.textContent = `ROUND ${String(round).padStart(2, "0")}`;
+        if (phaseNode) phaseNode.textContent = phases[scanRuntime.focusIndex % phases.length];
+        scanRuntime.focusIndex += 1;
+        setFocusTitle(slot);
+        pulseFocusCard();
+        drawFaceScan("focus", frame.image, frame.landmarks, frame.metrics, frame.statusText || "候点", {
+          remember: false,
+        });
+      }
+
+      function startFocusCycle() {
+        window.clearInterval(scanRuntime.focusTimer);
+        scanRuntime.focusIndex = 0;
+        renderFocusScan();
+        scanRuntime.focusTimer = window.setInterval(renderFocusScan, FOCUS_SWAP_INTERVAL);
+      }
+
+      function stopFocusCycle() {
+        window.clearInterval(scanRuntime.focusTimer);
+        scanRuntime.focusTimer = null;
+      }
+
+      async function drawScanSource(slot, statusText = "候点") {
+        const source = state.sources[slot];
+        if (!source) return;
+        const image = await loadImage(source);
+        drawFaceScan(slot, image, null, null, statusText);
+      }
+
+      function resetScanStage() {
+        stopFocusCycle();
+        scanRuntime.frames.self = null;
+        scanRuntime.frames.other = null;
+        setScanStatus("self", "候点", true);
+        setScanStatus("other", "候点", true);
+        setScanStatus("focus", "候点", true);
+        setFocusTitle("self");
+        const roundNode = document.getElementById("scanRound");
+        const phaseNode = document.getElementById("scanPhase");
+        if (roundNode) roundNode.textContent = "ROUND 01";
+        if (phaseNode) phaseNode.textContent = "三停校准";
+        return Promise.all([drawScanSource("self", "候点"), drawScanSource("other", "候点")])
+          .then(() => startFocusCycle())
+          .catch(() => {});
+      }
+
+      function analyzeByRegions(image) {
+        const metrics = getPixelMetrics(image);
+        metrics.face = { threeBalance: 0 };
+        metrics.engine = "regions";
+        metrics.engineLabel = "离线区位估算";
+        metrics.evidence = ["未启用关键点模型，按眉眼鼻颐区域的明暗、边缘与对称度取象。"];
+        metrics.measurements = [
+          { label: "眉眼区", value: Math.round(clamp(metrics.brow.symmetry * 100, 0, 100)), classical: "眉势左右参看" },
+          { label: "鼻中线", value: Math.round(clamp((metrics.nose.centerLift + 30) * 1.4, 0, 100)), classical: "鼻峰承起辅助" },
+          { label: "下停区", value: Math.round(clamp(metrics.jaw.symmetry * 100, 0, 100)), classical: "地阁承托辅助" },
+        ];
+        metrics.quality = "此为降级结果，适合看交互流程，不宜当作正式识别。";
+        return metrics;
+      }
+
+      function analyzeByLandmarks(image, faceLandmarker) {
+        const result = faceLandmarker.detect(image);
+        const faces = result.faceLandmarks || [];
+        if (faces.length === 0) throw makeAnalysisError("NO_FACE");
+        if (faces.length > 1) throw makeAnalysisError("MULTI_FACE");
+
+        const landmarks = faces[0];
+        const pixel = getPixelMetrics(image);
+        const faceTop = landmark(landmarks, 10);
+        const chin = landmark(landmarks, 152);
+        const cheekLeft = landmark(landmarks, 234);
+        const cheekRight = landmark(landmarks, 454);
+        const faceWidth = Math.max(distance(cheekLeft, cheekRight), 0.0001);
+        const faceHeight = Math.max(distance(faceTop, chin), 0.0001);
+
+        const rightBrowOuter = landmark(landmarks, 70);
+        const rightBrowCenter = landmark(landmarks, 105);
+        const rightBrowInner = landmark(landmarks, 107);
+        const leftBrowInner = landmark(landmarks, 336);
+        const leftBrowCenter = landmark(landmarks, 334);
+        const leftBrowOuter = landmark(landmarks, 300);
+        const browY = averagePoint(landmarks, [70, 63, 105, 66, 107, 336, 296, 334, 293, 300]).y;
+        const eyeUpperY = averagePoint(landmarks, [159, 386]).y;
+        const tailLift = safeRatio(
+          (rightBrowInner.y - rightBrowOuter.y + leftBrowInner.y - leftBrowOuter.y) / 2,
+          faceHeight,
+        );
+        const rightArch = safeRatio((rightBrowInner.y + rightBrowOuter.y) / 2 - rightBrowCenter.y, faceHeight);
+        const leftArch = safeRatio((leftBrowInner.y + leftBrowOuter.y) / 2 - leftBrowCenter.y, faceHeight);
+        const archHeight = (rightArch + leftArch) / 2;
+        const browSymmetry = clamp(1 - Math.abs(rightArch - leftArch) / 0.06, 0, 1);
+        const browEyeGap = safeRatio(eyeUpperY - browY, faceHeight);
+
+        const rightEyeWidth = Math.max(distance(landmark(landmarks, 33), landmark(landmarks, 133)), 0.0001);
+        const leftEyeWidth = Math.max(distance(landmark(landmarks, 263), landmark(landmarks, 362)), 0.0001);
+        const rightEyeOpen = safeRatio(distance(landmark(landmarks, 159), landmark(landmarks, 145)), rightEyeWidth);
+        const leftEyeOpen = safeRatio(distance(landmark(landmarks, 386), landmark(landmarks, 374)), leftEyeWidth);
+        const eyeOpenness = (rightEyeOpen + leftEyeOpen) / 2;
+        const eyeGapRatio = safeRatio(distance(landmark(landmarks, 133), landmark(landmarks, 362)), faceWidth);
+        const rightEyeTilt = safeRatio(landmark(landmarks, 33).y - landmark(landmarks, 133).y, rightEyeWidth);
+        const leftEyeTilt = safeRatio(landmark(landmarks, 263).y - landmark(landmarks, 362).y, leftEyeWidth);
+        const tiltBalance = clamp(1 - Math.abs(rightEyeTilt - leftEyeTilt) / 0.22, 0, 1);
+
+        const noseRoot = landmark(landmarks, 168);
+        const noseBase = landmark(landmarks, 2);
+        const nostrilLeft = landmark(landmarks, 98);
+        const nostrilRight = landmark(landmarks, 327);
+        const noseLength = safeRatio(distance(noseRoot, noseBase), faceHeight);
+        const noseWidth = safeRatio(distance(nostrilLeft, nostrilRight), faceWidth);
+        const noseCenterX = (nostrilLeft.x + nostrilRight.x) / 2;
+        const bridgeBalance = clamp(1 - Math.abs(noseRoot.x - noseCenterX) / (faceWidth * 0.16), 0, 1);
+        const bridgeRatio = safeRatio(noseLength, Math.max(noseWidth, 0.001));
+        const wingLeft = Math.abs(noseBase.x - nostrilLeft.x);
+        const wingRight = Math.abs(nostrilRight.x - noseBase.x);
+        const wingSymmetry = clamp(1 - Math.abs(wingLeft - wingRight) / (faceWidth * 0.14), 0, 1);
+
+        const mouthLeft = landmark(landmarks, 61);
+        const mouthRight = landmark(landmarks, 291);
+        const mouthTop = landmark(landmarks, 13);
+        const mouthBottom = landmark(landmarks, 14);
+        const mouthWidth = safeRatio(distance(mouthLeft, mouthRight), faceWidth);
+        const mouthOpenness = safeRatio(distance(mouthTop, mouthBottom), faceHeight);
+        const cornerBalance = clamp(1 - Math.abs(mouthLeft.y - mouthRight.y) / (faceHeight * 0.08), 0, 1);
+
+        const jawLeft = landmark(landmarks, 172);
+        const jawRight = landmark(landmarks, 397);
+        const jawWidth = safeRatio(distance(jawLeft, jawRight), faceWidth);
+        const chinCenter = clamp(1 - Math.abs(chin.x - (cheekLeft.x + cheekRight.x) / 2) / (faceWidth * 0.12), 0, 1);
+        const noseBaseY = noseBase.y;
+        const thirds = [browY - faceTop.y, noseBaseY - browY, chin.y - noseBaseY].map((value) =>
+          safeRatio(value, faceHeight),
+        );
+        const threeBalance = clamp(1 - (Math.max(...thirds) - Math.min(...thirds)) / 0.24, 0, 1);
+        const browLiftScore = clamp((tailLift + 0.02) / 0.06, 0, 1);
+        const eyeOpenScore = clamp(eyeOpenness / 0.34, 0, 1);
+        const noseWingScore = clamp((wingSymmetry + bridgeBalance) / 2, 0, 1);
+        const jawScore = clamp((chinCenter + jawWidth) / 2, 0, 1);
+        const measurements = [
+          { label: "三停", value: percent(threeBalance), classical: "三停相称" },
+          { label: "眉势", value: percent(browLiftScore), classical: "眉尾舒敛" },
+          { label: "目神", value: percent(eyeOpenScore), classical: "目宫开合" },
+          { label: "鼻准", value: percent(bridgeBalance), classical: "山根年寿" },
+          { label: "兰台", value: percent(noseWingScore), classical: "鼻翼收放" },
+          { label: "地阁", value: percent(jawScore), classical: "下停承接" },
+        ];
+
+        return {
+          ...pixel,
+          face: { threeBalance, thirds },
+          brow: {
+            ...pixel.brow,
+            tailLift,
+            archHeight,
+            browEyeGap,
+            symmetry: Math.max(pixel.brow.symmetry, browSymmetry),
+          },
+          eye: {
+            ...pixel.eye,
+            openness: eyeOpenness,
+            eyeGapRatio,
+            tiltBalance,
+          },
+          nose: {
+            ...pixel.nose,
+            bridgeRatio,
+            bridgeBalance,
+            widthRatio: noseWidth,
+            lengthRatio: noseLength,
+          },
+          wing: {
+            ...pixel.wing,
+            widthRatio: noseWidth,
+            wingSymmetry,
+            symmetry: Math.max(pixel.wing.symmetry, wingSymmetry),
+          },
+          mouth: {
+            ...pixel.mouth,
+            widthRatio: mouthWidth,
+            openness: mouthOpenness,
+            cornerBalance,
+          },
+          jaw: {
+            ...pixel.jaw,
+            taper: jawWidth,
+            chinCenter,
+          },
+          engine: "landmarks",
+          engineLabel: "本地面部点阵取象",
+          measurements,
+          evidence: [
+            `三停平衡 ${percent(threeBalance)}，先定上停、中停、下停`,
+            `眉尾舒展 ${percent(browLiftScore)}，兼看眉眼留气`,
+            `鼻线中正 ${percent(bridgeBalance)}，合参准头与兰台廷尉`,
+            `口角平衡 ${percent(cornerBalance)}，再取言路收放`,
+            `地阁居中 ${percent(chinCenter)}，下停观承接`,
+          ],
+          scanGuides: {
+            faceTopY: faceTop.y,
+            browY,
+            noseBaseY,
+            chinY: chin.y,
+          },
+          scanLandmarks: landmarks,
+          quality:
+            pixel.overall.contrast < 24
+              ? "照片光影偏淡，已按关键点为主、气色为辅处理。"
+              : "照片当下氛围仅作辅助参考。",
+        };
+      }
+
+      async function analyzeImage(src, faceLandmarker, scanSlot) {
+        const image = await loadImage(src);
+        if (!faceLandmarker) {
+          const metrics = analyzeByRegions(image);
+          drawFaceScan(scanSlot, image, null, metrics, "区位估算");
+          return metrics;
+        }
+        try {
+          const metrics = analyzeByLandmarks(image, faceLandmarker);
+          drawFaceScan(scanSlot, image, metrics.scanLandmarks, metrics, "已成点阵");
+          delete metrics.scanLandmarks;
+          delete metrics.scanGuides;
+          return metrics;
+        } catch (error) {
+          if (error.code === "NO_FACE" || error.code === "MULTI_FACE") throw error;
+          const metrics = analyzeByRegions(image);
+          drawFaceScan(scanSlot, image, null, metrics, "区位估算");
+          return metrics;
+        }
+      }
+
+      function pickRule(group, metrics) {
+        return physiognomyRules[group].find((rule) => rule.when(metrics));
+      }
+
+      function addWeights(profile, weights) {
+        Object.entries(weights).forEach(([key, value]) => {
+          profile[key] = (profile[key] || 0) + value;
+        });
+      }
+
+      function nearestFaceType(code) {
+        let best = faceTypeCatalog[0];
+        let bestScore = -1;
+        faceTypeCatalog.forEach((type) => {
+          const score = type.code.split("").filter((letter, index) => letter === code[index]).length;
+          if (score > bestScore) {
+            bestScore = score;
+            best = type;
+          }
+        });
+        return best;
+      }
+
+      function classifyFaceType(metrics, profile) {
+        const contour = (metrics.jaw?.taper || 0.6) < 0.56 || (metrics.jaw?.chinCenter || 0) < 0.74 ? "R" : "G";
+        const focus = (profile.order + profile.boundary) > (profile.response + profile.softness) ? "M" : "E";
+        const pace = (metrics.face?.threeBalance || 0) > 0.68 && (metrics.nose?.bridgeBalance || 0) > 0.58 ? "S" : "F";
+        const expression = profile.expression + (metrics.mouth?.openness || 0) * 100 > profile.boundary + 16 ? "O" : "I";
+        const rawCode = `${contour}${focus}${pace}${expression}`;
+        const type = nearestFaceType(rawCode);
+        return {
+          ...type,
+          rawCode,
+        };
+      }
+
+      function compactTermLine(item) {
+        const lines = {
+          眉势: "眉开有序，起落分明。",
+          眉骨: "眉弓有伏，主意有形。",
+          眉宇: "眉宇开舒，话路可明。",
+          目神: "目有应光，心先接话。",
+          目势: "两目平参，情理并看。",
+          目光: "目光含润，软语易通。",
+          目气: "神藏不露，观后而动。",
+          山根鼻梁: "山根有承，事要有凭。",
+          鼻准: "准头见主，落点要清。",
+          鼻峰: "峰脊有承，重在兑现。",
+          中停: "中停平稳，宜分步谈。",
+          兰台廷尉: "兰台相辅，安全有据。",
+          鼻翼: "翼有开合，近远有度。",
+          口势: "口角平承，言路有矩。",
+          唇气: "唇气外开，先缓后说。",
+          口气: "口势含蓄，话在心后。",
+          地阁: "地阁有归，重看长久。",
+          颐颌: "颐线有承，柔中有守。",
+          下停: "下停含蓄，守后再言。",
+          三停: "三停相称，先理后情。",
+          气色: "气色清和，宜慢宜问。",
+          气势: "气势有骨，先降温度。",
+          气息: "气息敛静，缓问更通。",
+        };
+        return lines[item.term] || "取象成意，只作沟通参考。";
+      }
+
+      function analyzeByClassicalRules(metrics, title) {
+        const groups = ["brow", "eye", "nose", "wing", "mouth", "jaw", "aura"];
+        const profile = {
+          order: 0,
+          response: 0,
+          stability: 0,
+          boundary: 0,
+          expression: 0,
+          softness: 0,
+        };
+        const terms = groups.map((group) => {
+          const rule = pickRule(group, metrics);
+          addWeights(profile, rule.weights);
+          return {
+            term: rule.term,
+            name: rule.name,
+            text: rule.text,
+            compact: compactTermLine(rule),
+          };
+        });
+
+        const style = terms
+          .slice(0, 3)
+          .map((item) => item.name.split("，")[0])
+          .join("，");
+
+        return {
+          title,
+          style,
+          terms,
+          metrics,
+          profile,
+          faceType: classifyFaceType(metrics, profile),
+          engine: metrics.engine,
+          engineLabel: metrics.engineLabel,
+          evidence: metrics.evidence || [],
+          measurements: metrics.measurements || [],
+          quality: metrics.quality || "",
+        };
+      }
+
+      function renderAnalysis() {
+        const target = document.getElementById("analysisCards");
+        target.innerHTML = state.analyses
+          .map(
+            (note) => `
+              <article class="person-card">
+                <div class="person-title">
+                  <strong>${note.title}</strong>
+                  <span class="hint">${note.style}</span>
+                </div>
+                <div class="type-card">
+                  <div class="type-avatar" style="--portrait-position:${note.faceType.portraitPosition}" role="img" aria-label="${note.faceType.historicalFigure}水墨头像"></div>
+                  <div class="type-info">
+                    <div class="type-kicker">F-BTI｜${note.faceType.code}</div>
+                    <h4>${note.faceType.name}</h4>
+                    <p>${note.faceType.tagline}</p>
+                    <p class="figure-line">历史参照：${note.faceType.historicalFigure}｜${note.faceType.historicalCue}</p>
+                    <div class="axis-tags">
+                      ${note.faceType.axes.map((axis) => `<span>${axis}</span>`).join("")}
+                    </div>
+                  </div>
+                </div>
+                <div class="measure-title">
+                  <span>实测入相</span>
+                  <span class="hint">取点数值 → 古法术语</span>
+                </div>
+                <div class="metric-grid">
+                  ${note.measurements
+                    .map(
+                      (item) => `
+                        <div class="metric-row">
+                          <span>${item.label}</span>
+                          <strong>${item.value}</strong>
+                          <em>${item.classical}</em>
+                        </div>
+                      `,
+                    )
+                    .join("")}
+                </div>
+                <ul class="term-list">
+                  ${note.terms.map((item) => `<li><b>${item.term}｜${item.name}</b><span>${item.compact}</span></li>`).join("")}
+                </ul>
+                <div class="measure-list">
+                  ${note.evidence.map((item) => `<span>${item}</span>`).join("")}
+                </div>
+                <div class="signal-line">
+                  <span>神气聚度</span>
+                  <div class="signal-bar"><span style="width:${clamp(note.profile.response * 3.8, 18, 96)}%"></span></div>
+                  <span>${Math.round(clamp(note.profile.response * 3.8, 18, 96))}</span>
+                </div>
+                <div class="signal-line">
+                  <span>地阁承度</span>
+                  <div class="signal-bar"><span style="width:${clamp(note.profile.stability * 4.1, 18, 96)}%"></span></div>
+                  <span>${Math.round(clamp(note.profile.stability * 4.1, 18, 96))}</span>
+                </div>
+              </article>
+            `,
+          )
+          .join("");
+      }
+
+      function sumProfile(key) {
+        return state.profiles.reduce((total, profile) => total + (profile[key] || 0), 0);
+      }
+
+      function diffProfile(key) {
+        const [first, second] = state.profiles;
+        return Math.abs((first?.[key] || 0) - (second?.[key] || 0));
+      }
+
+      function pickReport() {
+        const responseGap = diffProfile("response");
+        const stabilityGap = diffProfile("stability");
+        const expressionSum = sumProfile("expression");
+        const boundarySum = sumProfile("boundary");
+        const softnessSum = sumProfile("softness");
+        const seed = state.variant % 4;
+
+        if (expressionSum + seed > 42) return reports[2];
+        if (boundarySum > 36 && stabilityGap > 7) return reports[3];
+        if (softnessSum > 30 || responseGap < 6) return reports[1];
+        return reports[0];
+      }
+
+      function getLeadTerms(index) {
+        const analysis = state.analyses[index];
+        if (!analysis) return "";
+        return analysis.terms
+          .slice(0, 3)
+          .map((item) => `${item.term}取“${item.name}”`)
+          .join("，");
+      }
+
+      function getAnswerList() {
+        return (relationQuestions[state.relation] || []).map((item, index) => ({
+          question: item.question,
+          answer: state.answers[`q${index}`] || "",
+        }));
+      }
+
+      function getFaceSummary() {
+        return state.analyses.map((analysis) => ({
+          title: analysis.title,
+          engine: analysis.engineLabel,
+          style: analysis.style,
+          faceType: analysis.faceType,
+          measurements: analysis.measurements,
+          evidence: analysis.evidence,
+          terms: analysis.terms.map((item) => ({
+            term: item.term,
+            name: item.name,
+            compact: item.compact,
+            text: item.text,
+          })),
+          profile: analysis.profile,
+        }));
+      }
+
+      function getTypePairing(firstType, secondType) {
+        const first = firstType?.code || "";
+        const second = secondType?.code || "";
+        const sameCount = first.split("").filter((letter, index) => letter === second[index]).length;
+        const openMix = first[3] !== second[3];
+        const paceMix = first[2] !== second[2];
+        const focusMix = first[1] !== second[1];
+
+        if (sameCount >= 3) {
+          return {
+            name: "同频递茶局",
+            share: `我是${firstType.name}，TA是${secondType.name}，我们属于同频递茶局。`,
+            text: "你们看事情的节奏相近，容易一拍即合；但也容易一起默认“你懂我”，反而少了明说。",
+            advice: "适合用固定小约定保温：比如每天一句确认、每周一次复盘，把默契从感觉落到行动。",
+          };
+        }
+        if (openMix && focusMix) {
+          return {
+            name: "开合互译局",
+            share: `我是${firstType.name}，TA是${secondType.name}，我们属于开合互译局。`,
+            text: "一个更愿意把话说出来，一个更习惯先观察再表态。不是不合，是翻译器还没打开。",
+            advice: "外放的一方少连环追问，含蓄的一方给一个明确进度。先说“我现在需要一点时间”，比沉默更稳。",
+          };
+        }
+        if (paceMix) {
+          return {
+            name: "快慢搭台局",
+            share: `我是${firstType.name}，TA是${secondType.name}，我们属于快慢搭台局。`,
+            text: "一个反应快，一个落点稳；搭好了是加速器，没搭好就像一个按快进、一个按暂停。",
+            advice: "把事情拆成两步：先定情绪，再定动作。快的一方先降速，稳的一方给时间表。",
+          };
+        }
+        if (focusMix) {
+          return {
+            name: "眉目互照局",
+            share: `我是${firstType.name}，TA是${secondType.name}，我们属于眉目互照局。`,
+            text: "一个偏章法，一个偏回应。章法能立住关系的骨架，回应能让关系有温度。",
+            advice: "讨论时先用一句情绪确认开场，再进入规则和解决方案。顺序一对，火气少一半。",
+          };
+        }
+        return {
+          name: "山泽相承局",
+          share: `我是${firstType.name}，TA是${secondType.name}，我们属于山泽相承局。`,
+          text: "你们的差异不大，关键在表达落点：话说得太满会压人，话说得太少会让人猜。",
+          advice: "少用暗示，多用一句具体请求。把“你怎么这样”换成“我希望下一次可以这样”。",
+        };
+      }
+
+      function getCurrentPairing() {
+        return getTypePairing(state.analyses[0]?.faceType, state.analyses[1]?.faceType);
+      }
+
+      function buildLocalReport() {
+        const report = pickReport();
+        const first = state.analyses[0];
+        const second = state.analyses[1];
+        const pairing = getCurrentPairing();
+        const firstNeed = (first?.profile.response || 0) > (first?.profile.stability || 0) ? "先得回应而后安" : "先定章法而后言";
+        const secondNeed = (second?.profile.response || 0) > (second?.profile.stability || 0) ? "先得回应而后安" : "先定章法而后言";
+        const problem = state.problem || "当前卡点尚未细写";
+        return {
+          signName: pairing.name,
+          leadText: `${pairing.share} 古法取象一句话：${report.lead}`,
+          combinedText: `甲相为「${first?.faceType.name}」：${first?.faceType.tagline}；乙相为「${second?.faceType.name}」：${second?.faceType.tagline}。${pairing.text}`,
+          reasonText: `${problem}之所以反复，常见原因不是谁克谁，而是“${firstNeed}”与“${secondNeed}”的顺序没对上。`,
+          adviceText: `${pairing.advice} 日常可先做一件小事：把问题缩成一句请求、一个时间点、一个可执行动作。`,
+          iceText: report.ice,
+          basisText: `依据：甲乙 F-BTI、${getLeadTerms(0)}、${getLeadTerms(1)}，以及关系类型「${state.relation}」。${state.guided ? "如已问诊，将结合选择题回答细化。" : "本次为面相快速合参，未调用大模型。"}`,
+        };
+      }
+
+      function normalizeReport(report) {
+        const fallback = buildLocalReport();
+        return {
+          signName: report?.signName || report?.sign || fallback.signName,
+          leadText: report?.leadText || report?.lead || fallback.leadText,
+          combinedText: report?.combinedText || report?.combined || fallback.combinedText,
+          reasonText: report?.reasonText || report?.reason || fallback.reasonText,
+          adviceText: report?.adviceText || report?.advice || fallback.adviceText,
+          iceText: report?.iceText || report?.ice || fallback.iceText,
+          basisText: report?.basisText || report?.basis || fallback.basisText,
+        };
+      }
+
+      function renderReport(report = state.llmReport) {
+        const normalized = normalizeReport(report);
+        document.getElementById("signName").textContent = normalized.signName;
+        document.getElementById("leadText").textContent = normalized.leadText;
+        document.getElementById("combinedText").textContent = normalized.combinedText;
+        document.getElementById("reasonText").textContent = normalized.reasonText;
+        document.getElementById("adviceText").textContent = normalized.adviceText;
+        document.getElementById("iceText").textContent = normalized.iceText;
+        document.getElementById("basisText").textContent = normalized.basisText;
+      }
+
+      function buildLlmPayload() {
+        return {
+          relation: state.relation,
+          problem: state.problem,
+          need: state.need,
+          guided: state.guided,
+          faceSummary: getFaceSummary(),
+          facePairing: getCurrentPairing(),
+          answers: getAnswerList(),
+        };
+      }
+
+      async function requestLlmReport() {
+        const response = await fetch(LLM_PROXY_URL, {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify(buildLlmPayload()),
+        });
+        if (!response.ok) {
+          const message = await response.text();
+          throw new Error(message || "合参代理请求失败");
+        }
+        const data = await response.json();
+        return normalizeReport(data.report || data);
+      }
+
+      document.querySelectorAll("[data-next]").forEach((button) => {
+        button.addEventListener("click", () => showScreen(button.dataset.next));
+      });
+
+      document.querySelectorAll("[data-input]").forEach((input) => {
+        input.addEventListener("change", () => {
+          const file = input.files && input.files[0];
+          if (!file) return;
+          const upload = document.querySelector(`[data-upload="${input.dataset.input}"]`);
+          const reader = new FileReader();
+          reader.onload = () => {
+            let image = upload.querySelector("img");
+            if (!image) {
+              image = document.createElement("img");
+              image.alt = input.dataset.input === "self" ? "甲相照片预览" : "乙相照片预览";
+              upload.prepend(image);
+            }
+            image.src = reader.result;
+            upload.classList.add("has-image");
+            upload.querySelector("span").textContent = "已入卷";
+            state.photos[input.dataset.input] = true;
+            state.sources[input.dataset.input] = String(reader.result);
+          };
+          reader.readAsDataURL(file);
+        });
+      });
+
+      function runOraclePhrases() {
+        const phrases = [
+          "请入点阵，先定三停。",
+          "循眉尾眉弓，辨其舒敛。",
+          "取两目开合，观其神聚。",
+          "审山根鼻准，参兰台廷尉。",
+          "量口角颐颌，合双相而成文。",
+        ];
+        let index = 0;
+        const oracleText = document.getElementById("oracleText");
+        document.querySelectorAll("[data-oracle-step]").forEach((step) => step.classList.remove("active"));
+        document.querySelector('[data-oracle-step="0"]').classList.add("active");
+        oracleText.textContent = phrases[index];
+
+        return window.setInterval(() => {
+          index = (index + 1) % phrases.length;
+          oracleText.textContent = phrases[index];
+          document.querySelectorAll("[data-oracle-step]").forEach((step) => {
+            step.classList.toggle("active", Number(step.dataset.oracleStep) === Math.min(index, 3));
+          });
+        }, 620);
+      }
+
+      document.getElementById("analyze").addEventListener("click", async () => {
+        if (!state.photos.self || !state.photos.other) {
+          showToast("请先放入两张照片");
+          return;
+        }
+        if (!document.getElementById("consent").checked) {
+          showToast("请先确认授权");
+          return;
+        }
+        showScreen("screen-reading");
+        const readingStartedAt = performance.now();
+        const scanReady = resetScanStage();
+        const phraseTimer = runOraclePhrases();
+        try {
+          const engineNote = document.getElementById("engineNote");
+          engineNote.textContent = "正在启用本地点阵取象，照片仍在本机完成观测。";
+          let faceLandmarker = null;
+          try {
+            faceLandmarker = await getFaceLandmarker();
+            state.engine = "landmarks";
+            engineNote.textContent = "点阵已成：三停、眉势、目神、鼻准、口势、地阁同步取象。";
+          } catch (error) {
+            state.engine = "regions";
+            engineNote.textContent = "点阵暂不可用，先以离线区位估算推演；联网后可恢复精细识别。";
+          }
+          await scanReady;
+          setScanStatus("self", faceLandmarker ? "取点中" : "区位估算", true);
+          setScanStatus("other", faceLandmarker ? "取点中" : "区位估算", true);
+          const [selfMetrics, otherMetrics] = await Promise.all([
+            analyzeImage(state.sources.self, faceLandmarker, "self"),
+            analyzeImage(state.sources.other, faceLandmarker, "other"),
+          ]);
+          state.analyses = [
+            analyzeByClassicalRules(selfMetrics, "甲相"),
+            analyzeByClassicalRules(otherMetrics, "乙相"),
+          ];
+          state.profiles = state.analyses.map((item) => item.profile);
+          const remainingTime = Math.max(READING_MIN_DURATION - (performance.now() - readingStartedAt), 0);
+          document.getElementById("engineNote").textContent =
+            state.engine === "landmarks"
+              ? "AI 正在多轮复核双相点阵：三停、眉眼、鼻准、地阁交替校验。"
+              : "正在以离线区位估算多轮复核双相轮廓。";
+          await wait(remainingTime);
+          window.clearInterval(phraseTimer);
+          stopFocusCycle();
+          renderAnalysis();
+          showScreen("screen-analysis");
+        } catch (error) {
+          window.clearInterval(phraseTimer);
+          stopFocusCycle();
+          if (error.code === "NO_FACE") {
+            showToast("有一张照片未识别到清晰人脸");
+          } else if (error.code === "MULTI_FACE") {
+            showToast("每张照片请只保留一张人脸");
+          } else {
+            showToast("照片入卷失败，请重试");
+          }
+          showScreen("screen-upload");
+        }
+      });
+
+      document.querySelectorAll("[data-relation]").forEach((button) => {
+        button.addEventListener("click", () => {
+          if (state.relation !== button.dataset.relation) state.answers = {};
+          state.relation = button.dataset.relation;
+          setActive("[data-relation]", "relation", state.relation);
+        });
+      });
+
+      function enterRelationFlow(guided) {
+        state.guided = guided;
+        showScreen("screen-relation");
+      }
+
+      document.getElementById("startConsult").addEventListener("click", () => {
+        enterRelationFlow(true);
+      });
+
+      document.getElementById("skipConsult").addEventListener("click", () => {
+        enterRelationFlow(false);
+      });
+
+      function saveProblemInputs() {
+        state.problem = document.getElementById("problemInput").value.trim();
+        state.need = document.getElementById("needInput").value.trim();
+      }
+
+      function escapeHtml(value) {
+        return String(value || "")
+          .replaceAll("&", "&amp;")
+          .replaceAll("<", "&lt;")
+          .replaceAll(">", "&gt;")
+          .replaceAll('"', "&quot;");
+      }
+
+      function renderQuestionnaire() {
+        const questions = relationQuestions[state.relation] || relationQuestions.情侣;
+        const target = document.getElementById("questionList");
+        document.getElementById("consultHint").textContent = `${state.relation}｜${questions.length}问`;
+        target.innerHTML = `
+          <p class="llm-note">下面问题不是考试，只是帮助合参更贴近你们真实卡点。可按直觉选择，也可以留空。</p>
+          ${questions
+            .map(
+              (item, index) => `
+                <div class="question-card">
+                  <label>${index + 1}. ${item.question}</label>
+                  <div class="option-grid">
+                    ${item.options
+                      .map(
+                        (option) => `
+                          <button class="option-choice ${state.answers[`q${index}`] === option ? "active" : ""}" data-consult-answer="q${index}" data-value="${escapeHtml(option)}" type="button">${option}</button>
+                        `,
+                      )
+                      .join("")}
+                  </div>
+                </div>
+              `,
+            )
+            .join("")}
+        `;
+        target.querySelectorAll("[data-consult-answer]").forEach((button) => {
+          button.addEventListener("click", () => {
+            const key = button.dataset.consultAnswer;
+            state.answers[key] = button.dataset.value;
+            target.querySelectorAll(`[data-consult-answer="${key}"]`).forEach((item) => {
+              item.classList.toggle("active", item === button);
+            });
+          });
+        });
+      }
+
+      function collectConsultAnswers() {
+        document.querySelectorAll("[data-consult-answer].active").forEach((input) => {
+          state.answers[input.dataset.consultAnswer] = input.dataset.value || "";
+        });
+      }
+
+      async function generateFinalReport() {
+        saveProblemInputs();
+        collectConsultAnswers();
+        if (!state.problem && !state.need) {
+          showToast("请先写下你的问题或需求");
+          showScreen("screen-problem");
+          return;
+        }
+        showScreen("screen-finalizing");
+        if (!state.guided) {
+          await wait(650);
+          state.llmReport = buildLocalReport();
+          renderReport(state.llmReport);
+          showScreen("screen-result");
+          return;
+        }
+        try {
+          state.llmReport = await requestLlmReport();
+        } catch (error) {
+          state.llmReport = buildLocalReport();
+          showToast("合参代理未启用，已用本地规则成签");
+        }
+        renderReport(state.llmReport);
+        showScreen("screen-result");
+      }
+
+      document.getElementById("toProblem").addEventListener("click", () => {
+        const turn = document.getElementById("pageTurn");
+        turn.classList.add("show");
+        window.setTimeout(() => {
+          turn.classList.remove("show");
+          document.getElementById("toConsult").textContent = state.guided ? "继续问诊" : "直接合参";
+          showScreen("screen-problem");
+        }, 720);
+      });
+
+      document.getElementById("toConsult").addEventListener("click", () => {
+        saveProblemInputs();
+        if (!state.problem && !state.need) {
+          showToast("请先写下你的问题或需求");
+          return;
+        }
+        if (!state.guided) {
+          generateFinalReport();
+          return;
+        }
+        renderQuestionnaire();
+        showScreen("screen-consult");
+      });
+
+      document.getElementById("generate").addEventListener("click", () => {
+        generateFinalReport();
+      });
+
+      document.getElementById("again").addEventListener("click", () => {
+        state.variant += 1;
+        generateFinalReport();
+      });
+    </script>
+  </body>
+</html>
