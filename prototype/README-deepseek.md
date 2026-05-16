@@ -1,6 +1,6 @@
 # 两相知 DeepSeek 代理说明
 
-原型前端不会保存或暴露 DeepSeek API Key。要让“合参成签”真实调用模型，请在本地启动代理：
+原型前端不会保存或暴露 DeepSeek API Key，仓库也不保存任何真实 Key。要让“合参成签”真实调用模型，请每次演示时在本地终端临时启动代理：
 
 ```bash
 DEEPSEEK_API_KEY="你的 DeepSeek Key" node prototype/deepseek-proxy.mjs
@@ -32,3 +32,5 @@ window.LIANGXIANGZHI_API_URL = "http://127.0.0.1:8788/api/deepseek";
 - 关系问诊回答。
 
 不会发送原始照片、MediaPipe 原始点阵、人脸模板或可还原身份的特征。
+
+演示结束后直接关闭代理进程即可；不要把 Key 写入项目文件或提交到 GitHub。

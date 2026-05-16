@@ -15,7 +15,7 @@
 1. 先 clone 仓库并阅读 README.md、CODEX_HANDOFF.md、two-xiangzhi-prd.md、generation-playbook.md。
 2. 打开 prototype/index.html 作为主要原型页面；如果 Preview 不能直接打开 file 页面，就在仓库根目录运行 python3 -m http.server 5173，然后在右侧 Preview 打开 http://127.0.0.1:5173/prototype/index.html。
 3. 当前原型是静态 HTML/CSS/JS，不需要 npm install。
-4. 如果要测试大模型合参，使用环境变量启动代理：DEEPSEEK_API_KEY="你的 Key" node prototype/deepseek-proxy.mjs。不要把 Key 写入任何文件或提交。
+4. 如果要测试大模型合参，每次演示都使用环境变量临时启动代理：DEEPSEEK_API_KEY="你的 Key" node prototype/deepseek-proxy.mjs。不要把 Key 写入任何文件或提交。
 5. 开发时保持产品边界：不做身份识别、人脸库比对、颜值评分、人格定论、命运判断；不输出贬低、恐吓、决定性关系结论。
 6. 修改前先理解现有流程：上传甲乙照片 -> 本地面部点阵取象 -> 双相小记 -> 询问是否问诊 -> 选择关系 -> 输入卡点和需求 -> 可选选择题 -> 合参成签。
 7. 每次改完都检查 prototype/index.html 是否能正常打开，并搜索确认没有真实 API Key、没有旧版类型命名、没有前台技术日志式文案。
@@ -59,7 +59,7 @@ http://127.0.0.1:5173/prototype/index.html
 DEEPSEEK_API_KEY="你的 DeepSeek Key" node prototype/deepseek-proxy.mjs
 ```
 
-不要提交真实 Key。`.env` 和 `.env.*` 已经被 `.gitignore` 忽略。
+不要提交真实 Key。`.env` 和 `.env.*` 已经被 `.gitignore` 忽略；推荐每次演示只在终端临时传入新的 Key。
 
 ## 5. 必守安全边界
 

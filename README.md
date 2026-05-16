@@ -36,6 +36,8 @@ http://127.0.0.1:5173/prototype/index.html
 
 快速面相合参不调用大模型。只有用户选择回答问诊题后，才会请求本地代理。
 
+仓库不保存任何 DeepSeek API Key。每次演示都在本地终端临时传入新的 Key：
+
 ```bash
 DEEPSEEK_API_KEY="你的 DeepSeek Key" node prototype/deepseek-proxy.mjs
 ```
@@ -46,7 +48,7 @@ DEEPSEEK_API_KEY="你的 DeepSeek Key" node prototype/deepseek-proxy.mjs
 http://127.0.0.1:8787/api/deepseek
 ```
 
-不要把真实 API Key 写入仓库。请使用环境变量或本机 `.env`。
+不要把真实 API Key 写入任何项目文件，也不要提交 `.env`。
 
 ## 重要边界
 
@@ -66,4 +68,3 @@ http://127.0.0.1:8787/api/deepseek
 - 历史人物头像作为 F-BTI 象意参照。
 - 关系类型固定为：情侣、上下级、伙伴、明星、暧昧、同事（同门）。
 - 用户可选择快速合参，或回答选择题后调用 DeepSeek 合参。
-
