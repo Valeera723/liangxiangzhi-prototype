@@ -1259,7 +1259,7 @@
               <div class="oracle-box">
                 <div class="ink-wheel" aria-hidden="true"></div>
                 <h2 class="oracle-title">相法推演中</h2>
-                <p class="oracle-text" id="oracleText">先定三停，以观形局。</p>
+                <p class="oracle-text" id="oracleText">先定三庭，以观形局。</p>
                 <p class="oracle-engine" id="engineNote">请入双相点阵，先定眉目鼻颐之界。</p>
                 <div class="scan-card focus-card scanning" data-scan-card="focus">
                   <canvas class="scan-canvas" id="scanFocus"></canvas>
@@ -1268,7 +1268,7 @@
                 <div class="ai-phase-row" aria-label="AI 复核状态">
                   <span id="scanRound">ROUND 01</span>
                   <span>双相点阵</span>
-                  <span id="scanPhase">三停校准</span>
+                  <span id="scanPhase">三庭校准</span>
                 </div>
                 <div class="scan-grid" aria-label="面部关键点识别预览">
                   <div class="scan-card scanning" data-scan-card="self">
@@ -1281,7 +1281,7 @@
                   </div>
                 </div>
                 <div class="oracle-steps">
-                  <div class="oracle-step active" data-oracle-step="0"><span>一</span><span>定三停：额、准、颐三界先明。</span></div>
+                  <div class="oracle-step active" data-oracle-step="0"><span>一</span><span>定三庭：额、准、颐三界先明。</span></div>
                   <div class="oracle-step" data-oracle-step="1"><span>二</span><span>察五官：眉尾、眼裂、鼻准、口角、颌线各归其位。</span></div>
                   <div class="oracle-step" data-oracle-step="2"><span>三</span><span>参气色：光影只作氛围，不作吉凶定论。</span></div>
                   <div class="oracle-step" data-oracle-step="3"><span>四</span><span>合双相：不定吉凶，只问相处之节。</span></div>
@@ -1836,9 +1836,9 @@
         aura: [
           {
             when: (m) => (m.face?.threeBalance || 0) > 0.74 && m.overall.contrast < 62,
-            term: "三停",
-            name: "三停相称，形局有序",
-            text: "关键点以上停、中停、下停合参，比例不偏；古法先定三停，再察五官。象意为适合把矛盾拆清，不必急着给关系定性。",
+            term: "三庭",
+            name: "三庭相称，形局有序",
+            text: "关键点以上庭、中庭、下庭合参，比例不偏；古法先定三庭，再察五官。象意为适合把矛盾拆清，不必急着给关系定性。",
             weights: { order: 11, stability: 8, softness: 3 },
           },
           {
@@ -2297,7 +2297,7 @@
         const slot = order[scanRuntime.focusIndex % order.length];
         const frame = scanRuntime.frames[slot];
         if (!frame) return;
-        const phases = ["三停校准", "眉眼取势", "鼻准复核", "地阁合参", "双相联算"];
+        const phases = ["三庭校准", "眉眼取势", "鼻准复核", "地阁合参", "双相联算"];
         const round = Math.floor(scanRuntime.focusIndex / order.length) + 1;
         const roundNode = document.getElementById("scanRound");
         const phaseNode = document.getElementById("scanPhase");
@@ -2341,7 +2341,7 @@
         const roundNode = document.getElementById("scanRound");
         const phaseNode = document.getElementById("scanPhase");
         if (roundNode) roundNode.textContent = "ROUND 01";
-        if (phaseNode) phaseNode.textContent = "三停校准";
+        if (phaseNode) phaseNode.textContent = "三庭校准";
         return Promise.all([drawScanSource("self", "候点"), drawScanSource("other", "候点")])
           .then(() => startFocusCycle())
           .catch(() => {});
@@ -2440,7 +2440,7 @@
         const noseWingScore = clamp((wingSymmetry + bridgeBalance) / 2, 0, 1);
         const jawScore = clamp((chinCenter + jawWidth) / 2, 0, 1);
         const measurements = [
-          { label: "三停", value: percent(threeBalance), classical: "三停相称" },
+          { label: "三庭", value: percent(threeBalance), classical: "三庭相称" },
           { label: "眉势", value: percent(browLiftScore), classical: "眉尾舒敛" },
           { label: "目神", value: percent(eyeOpenScore), classical: "目宫开合" },
           { label: "鼻准", value: percent(bridgeBalance), classical: "山根年寿" },
@@ -2492,7 +2492,7 @@
           engineLabel: "本地面部点阵取象",
           measurements,
           evidence: [
-            `三停平衡 ${percent(threeBalance)}，先定上停、中停、下停`,
+            `三庭平衡 ${percent(threeBalance)}，先定上庭、中庭、下庭`,
             `眉尾舒展 ${percent(browLiftScore)}，兼看眉眼留气`,
             `鼻线中正 ${percent(bridgeBalance)}，合参准头与兰台廷尉`,
             `口角平衡 ${percent(cornerBalance)}，再取言路收放`,
@@ -2590,7 +2590,7 @@
           地阁: "地阁有归，重看长久。",
           颐颌: "颐线有承，柔中有守。",
           下停: "下停含蓄，守后再言。",
-          三停: "三停相称，先理后情。",
+          三庭: "三庭相称，先理后情。",
           气色: "气色清和，宜慢宜问。",
           气势: "气势有骨，先降温度。",
           气息: "气息敛静，缓问更通。",
@@ -2909,7 +2909,7 @@
 
       function runOraclePhrases() {
         const phrases = [
-          "请入点阵，先定三停。",
+          "请入点阵，先定三庭。",
           "循眉尾眉弓，辨其舒敛。",
           "取两目开合，观其神聚。",
           "审山根鼻准，参兰台廷尉。",
@@ -2950,7 +2950,7 @@
           try {
             faceLandmarker = await getFaceLandmarker();
             state.engine = "landmarks";
-            engineNote.textContent = "点阵已成：三停、眉势、目神、鼻准、口势、地阁同步取象。";
+            engineNote.textContent = "点阵已成：三庭、眉势、目神、鼻准、口势、地阁同步取象。";
           } catch (error) {
             state.engine = "regions";
             engineNote.textContent = "点阵暂不可用，先以离线区位估算推演；联网后可恢复精细识别。";
@@ -2970,7 +2970,7 @@
           const remainingTime = Math.max(READING_MIN_DURATION - (performance.now() - readingStartedAt), 0);
           document.getElementById("engineNote").textContent =
             state.engine === "landmarks"
-              ? "AI 正在多轮复核双相点阵：三停、眉眼、鼻准、地阁交替校验。"
+              ? "AI 正在多轮复核双相点阵：三庭、眉眼、鼻准、地阁交替校验。"
               : "正在以离线区位估算多轮复核双相轮廓。";
           await wait(remainingTime);
           window.clearInterval(phraseTimer);
