@@ -268,4 +268,4 @@
 
 水墨古图资产在：
 
-`assets/ink-face-manuscript.png`
+`assets/ink-face-manuscript.jpg`
