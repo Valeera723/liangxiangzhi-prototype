@@ -633,15 +633,19 @@
       }
 
       .type-avatar {
+        display: grid;
         width: 68px;
         height: 68px;
+        place-items: center;
         border: 2px solid rgba(162, 50, 44, 0.48);
         border-radius: 50%;
         background:
-          linear-gradient(rgba(255, 250, 240, 0.02), rgba(255, 250, 240, 0.02)),
-          url("../assets/fbti-historical-portraits.jpg");
-        background-position: var(--portrait-position, 0% 0%);
-        background-size: 400% 200%;
+          radial-gradient(circle at 35% 28%, rgba(255, 250, 240, 0.92), transparent 34%),
+          linear-gradient(135deg, rgba(162, 50, 44, 0.16), rgba(67, 107, 91, 0.16));
+        color: var(--seal);
+        font-family: "Songti SC", "STSong", serif;
+        font-size: 22px;
+        font-weight: 900;
         box-shadow:
           inset 0 0 0 3px rgba(255, 250, 240, 0.5),
           0 8px 20px rgba(63, 47, 25, 0.12);
@@ -1533,94 +1537,272 @@
         ],
       };
 
-      const faceTypeCatalog = [
+      const personalityCatalog = [
         {
-          key: "warmHost",
-          code: "R-E-S-O",
-          name: "嘴替书生",
-          portraitPosition: "0% 0%",
-          historicalFigure: "苏轼",
-          tagline: "圆融有应，言路舒开，适合把冷场救回人间。",
-          historicalCue: "取其画像中舒朗亲和、眉目有笑的文士气。",
-          publicCue: "分享感：一开口就像给尴尬递了台阶。",
-          axes: ["圆融轮廓", "目神回应", "中庭稳", "表达开"],
+          key: "darkTutor",
+          code: "P01",
+          relationCode: "G-M-S-I",
+          badge: "傅",
+          name: "腹黑太傅",
+          sentence: "外示温润内藏机锋，善谋断而不露声色",
+          figure: "贾诩——三国第一谋身者，算无遗策而自全",
+          features: {
+            眉势: "眉扬入鬓，清秀有威",
+            目光: "神光内敛，藏而不露",
+            鼻梁: "鼻直如筒，准头圆丰",
+            嘴巴: "唇线分明，抿守有度",
+            下庭: "地阁稳称，不欹不促",
+            五官走势: "五官端正，骨格清贵",
+          },
+          axes: ["藏锋", "谋断", "稳称"],
+          match: { hidden: 1.3, order: 0.9, stable: 0.7, boundary: 0.8, lowExpression: 0.4 },
         },
         {
-          key: "teaBuffer",
-          code: "R-E-S-I",
-          name: "慢热高僧",
-          portraitPosition: "33.333% 0%",
-          historicalFigure: "玄奘",
-          tagline: "面气温缓，眼神能接，擅长把炸点泡成温水。",
-          historicalCue: "取其画像中静定、收敛、先听后言之相。",
-          publicCue: "分享感：不抢话，但一句话能让场面降温。",
-          axes: ["圆融轮廓", "目神回应", "中庭稳", "表达藏"],
+          key: "lazyChancellor",
+          code: "P02",
+          relationCode: "R-E-S-I",
+          badge: "相",
+          name: "咸鱼丞相",
+          sentence: "看似无为实则心中有数，大智若愚",
+          figure: "曹参——萧规曹随，无为而治天下安",
+          features: {
+            眉势: "眉长垂顺，根根过目",
+            目光: "目秀温润，神光柔和",
+            鼻梁: "鼻直准圆，山根不陷",
+            嘴巴: "唇角微扬，厚薄适中",
+            下庭: "地阁方圆，晚运安稳",
+            五官走势: "五官和顺，气韵敦厚",
+          },
+          axes: ["温润", "稳当", "不急"],
+          match: { warm: 1.1, soft: 1, stable: 0.9, lowExpression: 0.7, balance: 0.5 },
         },
         {
-          key: "lampKeeper",
-          code: "R-M-S-O",
-          name: "排班谋士",
-          portraitPosition: "66.666% 0%",
-          historicalFigure: "张良",
-          tagline: "眉势有章，脸相有和，热心但喜欢事情有流程。",
-          historicalCue: "取其画像中雅正、审时、善定节奏的谋士气。",
-          publicCue: "分享感：嘴上说都行，手里已经排好了流程。",
-          axes: ["圆融轮廓", "眉骨章法", "中庭稳", "表达开"],
+          key: "dramaStrategist",
+          code: "P03",
+          relationCode: "R-M-F-I",
+          badge: "戏",
+          name: "戏精军师",
+          sentence: "表面云淡风轻，暗地里已布下天罗地网",
+          figure: "陈平——六出奇计，貌若温厚而机深似海",
+          features: {
+            眉势: "眉垂似善，尾散藏机",
+            目光: "眼含流转，忽藏忽露",
+            鼻梁: "鹰鼻曲准，鼻头尖锐",
+            嘴巴: "薄唇多变，笑抿无常",
+            下庭: "下庭略促，腮骨不丰",
+            五官走势: "外柔内刚，欹正相参",
+          },
+          axes: ["流转", "藏机", "奇计"],
+          match: { hidden: 0.9, quick: 0.9, boundary: 0.7, lowStability: 0.5, soft: 0.25 },
         },
         {
-          key: "bambooStrategist",
-          code: "G-M-S-I",
-          name: "憋招军师",
-          portraitPosition: "100% 0%",
-          historicalFigure: "诸葛亮",
-          tagline: "骨线清，眉意深，话不多但心里已经画完三版方案。",
-          historicalCue: "取其画像中清骨、远虑、谋定后动之相。",
-          publicCue: "分享感：表面风平浪静，脑内已开三场会。",
-          axes: ["骨线清", "眉骨章法", "中庭稳", "表达藏"],
+          key: "darkCensor",
+          code: "P04",
+          relationCode: "G-M-F-I",
+          badge: "御",
+          name: "腹黑御史",
+          sentence: "眉目犀利手段凌厉，城府深不可测",
+          figure: "张汤——汉武酷吏之首，用法严刻而心计深",
+          features: {
+            眉势: "眉扬若剑，凌云带锋",
+            目光: "目锐如锥，神光逼人",
+            鼻梁: "鹰鼻如钩，准头下垂",
+            嘴巴: "唇薄如刃，角垂不扬",
+            下庭: "下庭尖削，腮骨外张",
+            五官走势: "锋锐毕露，骨多肉少",
+          },
+          axes: ["锋锐", "城府", "严刻"],
+          match: { sharp: 1.35, boundary: 1.1, hidden: 0.7, lowSoftness: 0.7, quick: 0.35 },
         },
         {
-          key: "swiftPioneer",
-          code: "G-M-F-O",
-          name: "硬控将军",
-          portraitPosition: "0% 100%",
-          historicalFigure: "岳飞",
-          tagline: "眉峰带劲，行动带风，最怕事情卡在原地打转。",
-          historicalCue: "取其画像中正直、劲挺、骨气外显的将帅气。",
-          publicCue: "分享感：一进场就想把问题推进到下一步。",
-          axes: ["骨线清", "眉骨章法", "灵动快", "表达开"],
+          key: "rollKingGeneral",
+          code: "P05",
+          relationCode: "G-M-F-O",
+          badge: "将",
+          name: "卷王将军",
+          sentence: "精力无穷永不言倦，天生领袖气场全开",
+          figure: "霍去病——封狼居胥，少年冠军侯卷到极致",
+          features: {
+            眉势: "眉耸凌云，浓黑上扬",
+            目光: "目大光射，神采飞扬",
+            鼻梁: "鼻直颧昂，山根高挺",
+            嘴巴: "唇厚角扬，开合有力",
+            下庭: "地阁有势，腮颊圆丰",
+            五官走势: "五官开阔，气宇轩昂",
+          },
+          axes: ["高能", "领袖", "开阔"],
+          match: { open: 1.2, expression: 1, stable: 0.85, order: 0.65, sharp: 0.3 },
         },
         {
-          key: "flashRelay",
-          code: "G-E-F-O",
-          name: "秒懂剑客",
-          portraitPosition: "33.333% 100%",
-          historicalFigure: "荆轲",
-          tagline: "眼神反应快，情绪雷达灵，消息已读不回会被立刻捕捉。",
-          historicalCue: "取其画像中锋利、敏捷、临场反应快的剑客气。",
-          publicCue: "分享感：别人还在加载，你已经读到潜台词。",
-          axes: ["骨线清", "目神回应", "灵动快", "表达开"],
+          key: "melonOverlord",
+          code: "P06",
+          relationCode: "G-E-F-O",
+          badge: "枭",
+          name: "吃瓜枭雄",
+          sentence: "豪爽外表暗藏野心，一边吃瓜一边布局",
+          figure: "曹操——治世能臣乱世奸雄，谈笑间天下在握",
+          features: {
+            眉势: "眉浓连心，粗黑横张",
+            目光: "豹眼圆睁，光露有威",
+            鼻梁: "鹰鼻下垂，准头尖削",
+            嘴巴: "唇薄齿露，口角下垂",
+            下庭: "腮骨横张，地阁不丰",
+            五官走势: "风字面格，骨多肉少",
+          },
+          axes: ["豪爽", "野心", "布局"],
+          match: { sharp: 1.05, open: 1, boundary: 0.75, lowSoftness: 0.55, expression: 0.45 },
         },
         {
-          key: "cloudObserver",
-          code: "R-M-F-I",
-          name: "走神行者",
-          portraitPosition: "66.666% 100%",
-          historicalFigure: "徐霞客",
-          tagline: "看起来随和，心里有秤；不急着说，但都在记录。",
-          historicalCue: "取其画像中独行、观微、边走边校准的行者气。",
-          publicCue: "分享感：人在局里，心已经把地图画完了。",
-          axes: ["圆融轮廓", "眉骨章法", "灵动快", "表达藏"],
+          key: "socialEscort",
+          code: "P07",
+          relationCode: "R-E-S-O",
+          badge: "镖",
+          name: "社牛镖师",
+          sentence: "走哪都是主场，嗓门大朋友多古道热肠",
+          figure: "秦琼——马踏黄河两岸，交友遍天下",
+          features: {
+            眉势: "眉垂柔顺，根根见底",
+            目光: "眼大光露，坦荡无遮",
+            鼻梁: "鼻正准圆，山根平稳",
+            嘴巴: "唇厚角扬，口如含丹",
+            下庭: "腮颊圆丰，地阁敦厚",
+            五官走势: "五官舒展，气韵和暖",
+          },
+          axes: ["坦荡", "热肠", "主场"],
+          match: { open: 1.2, warm: 1.05, soft: 0.85, stable: 0.45, expression: 0.5 },
         },
         {
-          key: "mirrorCalibrator",
-          code: "G-E-S-I",
-          name: "边界镖客",
-          portraitPosition: "100% 100%",
-          historicalFigure: "班超",
-          tagline: "目神有应，边界清醒，热闹可以有，但别乱进我结界。",
-          historicalCue: "取其画像中守界、决断、远行不乱的使者气。",
-          publicCue: "分享感：可以并肩赶路，但路线要先说清。",
-          axes: ["骨线清", "目神回应", "中庭稳", "表达藏"],
+          key: "introvertAssassin",
+          code: "P08",
+          relationCode: "G-E-F-I",
+          badge: "刺",
+          name: "社恐刺客",
+          sentence: "来去如风出手精准，事了拂衣深藏功名",
+          figure: "聂政——一击而中，毁容自尽不累亲",
+          features: {
+            眉势: "眉势低顺，尾散不定",
+            目光: "目圆闪烁，神光游移",
+            鼻梁: "鹰鼻略曲，准头不丰",
+            嘴巴: "薄唇常抿，角势内收",
+            下庭: "下庭窄促，腮骨薄削",
+            五官走势: "五官紧束，气韵清寂",
+          },
+          axes: ["清寂", "精准", "内收"],
+          match: { hidden: 1.1, lowExpression: 0.9, quick: 0.65, lowStability: 0.65, narrow: 0.45 },
+        },
+        {
+          key: "loafingScholar",
+          code: "P09",
+          relationCode: "R-M-S-I",
+          badge: "翰",
+          name: "摸鱼翰林",
+          sentence: "才华横溢却懒得外露，能躺绝不坐着",
+          figure: "嵇康——竹林打铁，才华绝世偏爱摸鱼",
+          features: {
+            眉势: "眉清而秀，舒扬不蹙",
+            目光: "目秀神藏，时见放空",
+            鼻梁: "鼻直不陷，准头圆润",
+            嘴巴: "唇角微扬，似笑非笑",
+            下庭: "中下庭匀，不丰不促",
+            五官走势: "上庭独阔，骨格清奇",
+          },
+          axes: ["清奇", "放空", "才气"],
+          match: { hidden: 0.9, soft: 0.75, order: 0.7, lowExpression: 0.75, balance: 0.35 },
+        },
+        {
+          key: "wellnessAbbot",
+          code: "P10",
+          relationCode: "R-E-S-I",
+          badge: "养",
+          name: "养生方丈",
+          sentence: "与世无争颐养天年，开口便是养生经",
+          figure: "孙思邈——药王寿百岁，养生即是渡人",
+          features: {
+            眉势: "眉长垂顺，寿毫可辨",
+            目光: "目秀神安，温润有慈",
+            鼻梁: "鼻正准丰，山根敦厚",
+            嘴巴: "唇厚角扬，人中深直",
+            下庭: "地阁浑圆，耳垂肥厚",
+            五官走势: "五官圆融，福泽深厚",
+          },
+          axes: ["温润", "圆融", "养生"],
+          match: { warm: 1.2, soft: 1.1, stable: 0.8, lowExpression: 0.55, balance: 0.5 },
+        },
+        {
+          key: "cheatScholar",
+          code: "P11",
+          relationCode: "G-M-F-O",
+          badge: "状",
+          name: "开挂状元",
+          sentence: "天资聪颖一路开挂，唯恨时光不够用",
+          figure: "王勃——六岁能文，滕王阁序惊艳千年",
+          features: {
+            眉势: "眉扬清秀，高耸入鬓",
+            目光: "目大明亮，神采外放",
+            鼻梁: "鼻梁挺直，颧骨有势",
+            嘴巴: "唇线分明，口角上扬",
+            下庭: "下庭略促，地阁稍窄",
+            五官走势: "上庭独秀，气势昂扬",
+          },
+          axes: ["聪颖", "外放", "昂扬"],
+          match: { open: 0.95, order: 0.95, quick: 0.9, expression: 0.7, sharp: 0.25 },
+        },
+        {
+          key: "foodieSquire",
+          code: "P12",
+          relationCode: "R-E-S-O",
+          badge: "员",
+          name: "吃货员外",
+          sentence: "天大地大吃饭最大，和气生财福气自来",
+          figure: "苏东坡——黄州炖肉海南吃蚝，贬到哪吃到哪",
+          features: {
+            眉势: "眉垂柔顺，根根温存",
+            目光: "眼大光暖，不锐不冷",
+            鼻梁: "鼻圆准丰，山根敦实",
+            嘴巴: "唇厚色红，角扬常笑",
+            下庭: "地阁浑圆，人中深长",
+            五官走势: "五官丰圆，一团和气",
+          },
+          axes: ["和气", "福气", "会吃"],
+          match: { warm: 1.25, soft: 1.05, stable: 0.65, open: 0.55, balance: 0.35 },
+        },
+        {
+          key: "koiGoodPerson",
+          code: "P15",
+          relationCode: "R-E-S-O",
+          badge: "善",
+          name: "锦鲤善人",
+          sentence: "天生福星走到哪旺到哪，温厚正直人缘好",
+          figure: "郭子仪——功高震主而主不疑，五福齐全",
+          features: {
+            眉势: "眉清目秀，根根见底",
+            目光: "眼正神清，黑白分明",
+            鼻梁: "鼻直口方，准头圆润",
+            嘴巴: "唇红齿白，口角端正",
+            下庭: "地阁匀称，耳垂肥厚",
+            五官走势: "五官端正，格局清朗",
+          },
+          axes: ["温厚", "端正", "人缘"],
+          match: { balance: 1.25, warm: 0.95, stable: 0.85, order: 0.5, soft: 0.35 },
+        },
+        {
+          key: "sharpJudge",
+          code: "P16",
+          relationCode: "G-M-F-O",
+          badge: "判",
+          name: "扎心判官",
+          sentence: "眼光毒辣一针见血，嘴毒心不坏情商欠费",
+          figure: "汲黯——直言敢谏，汉武帝亦敬而远之",
+          features: {
+            眉势: "眉浓杂乱，逆生带锋",
+            目光: "三角眼尾，神光阴沉",
+            鼻梁: "鼻梁欹斜，准头不圆",
+            嘴巴: "唇薄色淡，齿露不齐",
+            下庭: "颧高无肉，地阁削薄",
+            五官走势: "五官欹斜，骨多肉少",
+          },
+          axes: ["毒辣", "直言", "扎心"],
+          match: { sharp: 1.2, boundary: 1, lowSoftness: 0.85, quick: 0.45, lowStability: 0.35 },
         },
       ];
 
@@ -2543,59 +2725,74 @@
         });
       }
 
-      function nearestFaceType(code) {
-        let best = faceTypeCatalog[0];
+      function getPersonalitySignals(metrics, profile) {
+        const threeBalance = metrics.face?.threeBalance || 0.58;
+        const bridgeBalance = metrics.nose?.bridgeBalance || metrics.nose?.symmetry || 0.58;
+        const jawCenter = metrics.jaw?.chinCenter || metrics.jaw?.symmetry || 0.58;
+        const brightness = metrics.overall?.brightness || 128;
+        const contrast = metrics.overall?.contrast || 42;
+        const edgeAverage = ((metrics.brow?.edge || 0) + (metrics.eye?.edge || 0) + (metrics.jaw?.edge || 0)) / 3;
+        const openScore = profile.expression + profile.response + (metrics.eye?.openness || 0) * 80 + (metrics.mouth?.openness || 0) * 90;
+        const warmScore = profile.response + profile.softness + clamp((brightness - 118) / 2.4, 0, 24);
+        const sharpScore = profile.boundary + profile.expression + clamp((contrast - 36) / 1.7, 0, 24) + clamp((edgeAverage - 22) / 1.4, 0, 18);
+        const stableScore = profile.stability + profile.order + threeBalance * 18 + bridgeBalance * 10 + jawCenter * 8;
+        const hiddenScore = profile.order + profile.boundary + clamp(34 - profile.expression, 0, 28);
+        const balanceScore = threeBalance * 24 + bridgeBalance * 16 + jawCenter * 12 + clamp(72 - Math.abs(contrast - 46), 0, 36) / 3;
+
+        return {
+          order: profile.order,
+          response: profile.response,
+          stability: profile.stability,
+          boundary: profile.boundary,
+          expression: profile.expression,
+          softness: profile.softness,
+          open: openScore,
+          warm: warmScore,
+          sharp: sharpScore,
+          stable: stableScore,
+          hidden: hiddenScore,
+          quick: profile.expression + clamp((0.72 - threeBalance) * 55, 0, 20) + clamp((contrast - 42) / 2, 0, 15),
+          balance: balanceScore,
+          soft: profile.softness + clamp((brightness - 122) / 2.5, 0, 22),
+          narrow: clamp(0.7 - jawCenter, 0, 0.7) * 36 + clamp(0.58 - (metrics.jaw?.taper || 0.58), 0, 0.58) * 28,
+          lowExpression: clamp(34 - profile.expression, 0, 34),
+          lowStability: clamp(34 - profile.stability, 0, 34),
+          lowSoftness: clamp(34 - profile.softness, 0, 34),
+        };
+      }
+
+      function pickPersonality(metrics, profile) {
+        const signals = getPersonalitySignals(metrics, profile);
+        let best = personalityCatalog[0];
         let bestScore = -1;
-        faceTypeCatalog.forEach((type) => {
-          const score = type.code.split("").filter((letter, index) => letter === code[index]).length;
+        personalityCatalog.forEach((type) => {
+          const score = Object.entries(type.match).reduce((total, [key, weight]) => total + (signals[key] || 0) * weight, 0);
           if (score > bestScore) {
             bestScore = score;
             best = type;
           }
         });
-        return best;
+        return {
+          ...best,
+          matchScore: Math.round(bestScore),
+        };
       }
 
       function classifyFaceType(metrics, profile) {
-        const contour = (metrics.jaw?.taper || 0.6) < 0.56 || (metrics.jaw?.chinCenter || 0) < 0.74 ? "R" : "G";
-        const focus = (profile.order + profile.boundary) > (profile.response + profile.softness) ? "M" : "E";
-        const pace = (metrics.face?.threeBalance || 0) > 0.68 && (metrics.nose?.bridgeBalance || 0) > 0.58 ? "S" : "F";
-        const expression = profile.expression + (metrics.mouth?.openness || 0) * 100 > profile.boundary + 16 ? "O" : "I";
-        const rawCode = `${contour}${focus}${pace}${expression}`;
-        const type = nearestFaceType(rawCode);
+        const type = pickPersonality(metrics, profile);
         return {
           ...type,
-          rawCode,
+          rawCode: type.relationCode,
         };
       }
 
-      function compactTermLine(item) {
-        const lines = {
-          眉势: "眉开有序，起落分明。",
-          眉骨: "眉弓有伏，主意有形。",
-          眉宇: "眉宇开舒，话路可明。",
-          目神: "目有应光，心先接话。",
-          目势: "两目平参，情理并看。",
-          目光: "目光含润，软语易通。",
-          目气: "神藏不露，观后而动。",
-          山根鼻梁: "山根有承，事要有凭。",
-          鼻准: "准头见主，落点要清。",
-          鼻峰: "峰脊有承，重在兑现。",
-          中停: "中停平稳，宜分步谈。",
-          兰台廷尉: "兰台相辅，安全有据。",
-          鼻翼: "翼有开合，近远有度。",
-          口势: "口角平承，言路有矩。",
-          唇气: "唇气外开，先缓后说。",
-          口气: "口势含蓄，话在心后。",
-          地阁: "地阁有归，重看长久。",
-          颐颌: "颐线有承，柔中有守。",
-          下停: "下停含蓄，守后再言。",
-          三庭: "三庭相称，先理后情。",
-          气色: "气色清和，宜慢宜问。",
-          气势: "气势有骨，先降温度。",
-          气息: "气息敛静，缓问更通。",
-        };
-        return lines[item.term] || "取象成意，只作沟通参考。";
+      function buildPersonalityTerms(personality) {
+        return ["眉势", "目光", "鼻梁", "嘴巴", "下庭", "五官走势"].map((term) => ({
+          term,
+          name: personality.features[term],
+          compact: personality.sentence,
+          text: personality.features[term],
+        }));
       }
 
       function analyzeByClassicalRules(metrics, title) {
@@ -2608,29 +2805,29 @@
           expression: 0,
           softness: 0,
         };
-        const terms = groups.map((group) => {
+        const ruleTerms = groups.map((group) => {
           const rule = pickRule(group, metrics);
           addWeights(profile, rule.weights);
           return {
             term: rule.term,
             name: rule.name,
             text: rule.text,
-            compact: compactTermLine(rule),
+            compact: rule.text,
           };
         });
+        const faceType = classifyFaceType(metrics, profile);
+        const terms = buildPersonalityTerms(faceType);
 
-        const style = terms
-          .slice(0, 3)
-          .map((item) => item.name.split("，")[0])
-          .join("，");
+        const style = `${faceType.name}｜${faceType.sentence}`;
 
         return {
           title,
           style,
           terms,
+          ruleTerms,
           metrics,
           profile,
-          faceType: classifyFaceType(metrics, profile),
+          faceType,
           engine: metrics.engine,
           engineLabel: metrics.engineLabel,
           evidence: metrics.evidence || [],
@@ -2647,15 +2844,15 @@
               <article class="person-card">
                 <div class="person-title">
                   <strong>${note.title}</strong>
-                  <span class="hint">${note.style}</span>
+                  <span class="hint">面相人格</span>
                 </div>
                 <div class="type-card">
-                  <div class="type-avatar" style="--portrait-position:${note.faceType.portraitPosition}" role="img" aria-label="${note.faceType.historicalFigure}水墨头像"></div>
+                  <div class="type-avatar" role="img" aria-label="${note.faceType.name}人格印记">${note.faceType.badge}</div>
                   <div class="type-info">
-                    <div class="type-kicker">F-BTI｜${note.faceType.code}</div>
+                    <div class="type-kicker">十六人格｜${note.faceType.code}</div>
                     <h4>${note.faceType.name}</h4>
-                    <p>${note.faceType.tagline}</p>
-                    <p class="figure-line">历史参照：${note.faceType.historicalFigure}｜${note.faceType.historicalCue}</p>
+                    <p>${note.faceType.sentence}</p>
+                    <p class="figure-line">匹配人物：${note.faceType.figure}</p>
                     <div class="axis-tags">
                       ${note.faceType.axes.map((axis) => `<span>${axis}</span>`).join("")}
                     </div>
@@ -2679,7 +2876,7 @@
                     .join("")}
                 </div>
                 <ul class="term-list">
-                  ${note.terms.map((item) => `<li><b>${item.term}｜${item.name}</b><span>${item.compact}</span></li>`).join("")}
+                  ${note.terms.map((item) => `<li><b>${item.term}</b><span>${item.name}</span></li>`).join("")}
                 </ul>
                 <div class="measure-list">
                   ${note.evidence.map((item) => `<span>${item}</span>`).join("")}
@@ -2747,6 +2944,11 @@
           faceType: analysis.faceType,
           measurements: analysis.measurements,
           evidence: analysis.evidence,
+          ruleTerms: (analysis.ruleTerms || []).map((item) => ({
+            term: item.term,
+            name: item.name,
+            text: item.text,
+          })),
           terms: analysis.terms.map((item) => ({
             term: item.term,
             name: item.name,
@@ -2758,8 +2960,8 @@
       }
 
       function getTypePairing(firstType, secondType) {
-        const first = firstType?.code || "";
-        const second = secondType?.code || "";
+        const first = firstType?.relationCode || firstType?.code || "";
+        const second = secondType?.relationCode || secondType?.code || "";
         const sameCount = first.split("").filter((letter, index) => letter === second[index]).length;
         const openMix = first[3] !== second[3];
         const paceMix = first[2] !== second[2];
@@ -2820,11 +3022,11 @@
         return {
           signName: pairing.name,
           leadText: `${pairing.share} 古法取象一句话：${report.lead}`,
-          combinedText: `甲相为「${first?.faceType.name}」：${first?.faceType.tagline}；乙相为「${second?.faceType.name}」：${second?.faceType.tagline}。${pairing.text}`,
+          combinedText: `甲相为「${first?.faceType.name}」：${first?.faceType.sentence}；乙相为「${second?.faceType.name}」：${second?.faceType.sentence}。${pairing.text}`,
           reasonText: `${problem}之所以反复，常见原因不是谁克谁，而是“${firstNeed}”与“${secondNeed}”的顺序没对上。`,
           adviceText: `${pairing.advice} 日常可先做一件小事：把问题缩成一句请求、一个时间点、一个可执行动作。`,
           iceText: report.ice,
-          basisText: `依据：甲乙 F-BTI、${getLeadTerms(0)}、${getLeadTerms(1)}，以及关系类型「${state.relation}」。${state.guided ? "如已问诊，将结合选择题回答细化。" : "本次为面相快速合参，未调用大模型。"}`,
+          basisText: `依据：甲乙面相十六人格、${getLeadTerms(0)}、${getLeadTerms(1)}，以及关系类型「${state.relation}」。${state.guided ? "如已问诊，将结合选择题回答细化。" : "本次为面相快速合参，未调用大模型。"}`,
         };
       }
 
