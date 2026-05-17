@@ -68,9 +68,9 @@ DEEPSEEK_API_KEY="你的 DeepSeek Key" node prototype/deepseek-proxy.mjs
 - 不保存原始照片、人脸模板或可还原身份的特征。
 - 不做颜值、人格、忠诚、出轨、疾病、寿命、财运判断。
 - 不说“克”“命定”“必须分手”“此人不可信”“面相不好”等结论。
-- 匹配人物只作为面相十六人格的象意参照，不声称用户长得像某位历史人物。
+- 匹配人物只作为 FBTI 面相人格的象意参照，不声称用户长得像某位历史人物。
 
-## 6. 当前面相十六人格
+## 6. 当前 FBTI 面相人格
 
 - 腹黑太傅：贾诩参照。
 - 咸鱼丞相：曹参参照。
@@ -93,5 +93,5 @@ DEEPSEEK_API_KEY="你的 DeepSeek Key" node prototype/deepseek-proxy.mjs
 node --check prototype/deepseek-proxy.mjs
 node -e "const fs=require('fs'); const html=fs.readFileSync('prototype/index.html','utf8'); const scripts=[...html.matchAll(/<script>([\s\S]*?)<\/script>/g)].map(m=>m[1]); scripts.forEach(src=>new Function(src)); console.log('index scripts ok');"
 rg -n "sk-[A-Za-z0-9]{16,}|DEEPSEEK_API_KEY=\"sk-" .
-rg -n "面相 MBTI|MediaPipe Face Landmarker 478点定位|人脸关键点已定位|cartoon|卡通" prototype/index.html prototype/deepseek-proxy.mjs
+rg -n "面相 MBTI|cartoon|卡通" prototype/index.html prototype/deepseek-proxy.mjs
 ```

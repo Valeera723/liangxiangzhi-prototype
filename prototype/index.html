@@ -451,6 +451,10 @@
         padding: 0 14px 14px;
       }
 
+      .result-actions {
+        grid-template-columns: 1fr 1fr 1fr;
+      }
+
       .single-action {
         grid-template-columns: 1fr;
       }
@@ -633,19 +637,13 @@
       }
 
       .type-avatar {
-        display: grid;
         width: 68px;
         height: 68px;
-        place-items: center;
         border: 2px solid rgba(162, 50, 44, 0.48);
         border-radius: 50%;
-        background:
-          radial-gradient(circle at 35% 28%, rgba(255, 250, 240, 0.92), transparent 34%),
-          linear-gradient(135deg, rgba(162, 50, 44, 0.16), rgba(67, 107, 91, 0.16));
-        color: var(--seal);
-        font-family: "Songti SC", "STSong", serif;
-        font-size: 22px;
-        font-weight: 900;
+        background-image: url("../assets/fbti-personality-portraits.png");
+        background-position: var(--portrait-position, 0% 0%);
+        background-size: 700% 200%;
         box-shadow:
           inset 0 0 0 3px rgba(255, 250, 240, 0.5),
           0 8px 20px rgba(63, 47, 25, 0.12);
@@ -1160,6 +1158,180 @@
         padding: 14px;
       }
 
+      .share-sheet {
+        position: fixed;
+        inset: 0;
+        z-index: 30;
+        display: none;
+        place-items: center;
+        padding: 18px;
+      }
+
+      .share-sheet.show {
+        display: grid;
+      }
+
+      .share-backdrop {
+        position: absolute;
+        inset: 0;
+        background:
+          radial-gradient(circle at 50% 18%, rgba(255, 250, 240, 0.2), transparent 28%),
+          rgba(18, 18, 16, 0.64);
+        backdrop-filter: blur(8px);
+      }
+
+      .share-panel {
+        position: relative;
+        z-index: 1;
+        width: min(380px, 100%);
+        border: 1px solid rgba(255, 250, 240, 0.42);
+        border-radius: 10px;
+        background: rgba(44, 38, 28, 0.92);
+        padding: 10px;
+        box-shadow: 0 24px 60px rgba(27, 26, 22, 0.34);
+      }
+
+      .share-toolbar {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        gap: 10px;
+        padding: 2px 2px 10px;
+        color: #fff9ea;
+        font-size: 13px;
+        font-weight: 900;
+      }
+
+      .share-toolbar .ghost {
+        min-height: 32px;
+        border-color: rgba(255, 250, 240, 0.34);
+        color: #fff9ea;
+        padding: 0 10px;
+      }
+
+      .share-card {
+        position: relative;
+        overflow: hidden;
+        border: 1px solid rgba(154, 116, 46, 0.28);
+        border-radius: 8px;
+        background:
+          linear-gradient(145deg, rgba(255, 250, 240, 0.96), rgba(236, 224, 199, 0.96)),
+          var(--paper);
+        padding: 16px;
+        color: var(--ink);
+      }
+
+      .share-card::before {
+        position: absolute;
+        right: -46px;
+        bottom: -58px;
+        width: 190px;
+        height: 190px;
+        background: url("../assets/ink-face-manuscript.jpg") center / cover no-repeat;
+        content: "";
+        opacity: 0.08;
+      }
+
+      .share-card > * {
+        position: relative;
+        z-index: 1;
+      }
+
+      .share-brand {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        gap: 10px;
+        color: var(--seal);
+        font-size: 12px;
+        font-weight: 900;
+      }
+
+      .share-brand span {
+        color: var(--muted);
+      }
+
+      .share-card h3 {
+        margin: 10px 0 6px;
+        color: var(--ink);
+        font-size: 24px;
+        line-height: 1.2;
+      }
+
+      .share-summary {
+        margin: 0;
+        color: var(--muted);
+        font-size: 13px;
+        line-height: 1.7;
+      }
+
+      .share-people {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: 8px;
+        margin: 14px 0;
+      }
+
+      .share-person {
+        display: grid;
+        gap: 7px;
+        justify-items: center;
+        border: 1px solid rgba(154, 116, 46, 0.22);
+        border-radius: 8px;
+        background: rgba(255, 250, 240, 0.62);
+        padding: 10px 8px;
+        text-align: center;
+      }
+
+      .share-portrait {
+        width: 74px;
+        height: 74px;
+        border: 2px solid rgba(162, 50, 44, 0.42);
+        border-radius: 50%;
+        background-image: url("../assets/fbti-personality-portraits.png");
+        background-position: var(--portrait-position, 0% 0%);
+        background-size: 700% 200%;
+        box-shadow: inset 0 0 0 3px rgba(255, 250, 240, 0.5);
+      }
+
+      .share-person span,
+      .share-person em {
+        color: var(--muted);
+        font-size: 11px;
+        font-style: normal;
+      }
+
+      .share-person strong {
+        display: block;
+        margin: 2px 0;
+        color: var(--ink);
+        font-size: 14px;
+      }
+
+      .share-signature {
+        border-top: 1px solid rgba(154, 116, 46, 0.24);
+        margin: 12px 0 0;
+        padding-top: 10px;
+        color: var(--tea-dark);
+        font-size: 12px;
+        font-weight: 800;
+        line-height: 1.6;
+      }
+
+      .share-disclaimer {
+        display: block;
+        margin-top: 10px;
+        color: rgba(104, 91, 66, 0.58);
+        font-size: 10px;
+      }
+
+      .share-helper {
+        margin: 10px 2px 0;
+        color: rgba(255, 250, 240, 0.78);
+        font-size: 11px;
+        text-align: center;
+      }
+
       .toast {
         position: fixed;
         left: 50%;
@@ -1430,13 +1602,26 @@
                 </article>
               </section>
 
-              <div class="actions">
+              <div class="actions result-actions">
                 <button class="secondary" id="again" type="button">换一签</button>
                 <button class="ghost" type="button" data-next="screen-upload">重新开始</button>
+                <button class="secondary" id="shareReport" type="button">生成分享</button>
               </div>
             </main>
           </section>
         </div>
+      </div>
+    </div>
+
+    <div class="share-sheet" id="shareSheet" aria-hidden="true">
+      <div class="share-backdrop" id="shareBackdrop"></div>
+      <div class="share-panel" role="dialog" aria-modal="true" aria-label="分享卡片">
+        <div class="share-toolbar">
+          <strong>分享卡片</strong>
+          <button class="ghost" id="closeShare" type="button">收起</button>
+        </div>
+        <div class="share-card" id="shareCard"></div>
+        <p class="share-helper">长按或截图分享，把这支合相签递出去。</p>
       </div>
     </div>
 
@@ -1542,7 +1727,6 @@
           key: "darkTutor",
           code: "P01",
           relationCode: "G-M-S-I",
-          badge: "傅",
           name: "腹黑太傅",
           sentence: "外示温润内藏机锋，善谋断而不露声色",
           figure: "贾诩——三国第一谋身者，算无遗策而自全",
@@ -1561,7 +1745,6 @@
           key: "lazyChancellor",
           code: "P02",
           relationCode: "R-E-S-I",
-          badge: "相",
           name: "咸鱼丞相",
           sentence: "看似无为实则心中有数，大智若愚",
           figure: "曹参——萧规曹随，无为而治天下安",
@@ -1580,7 +1763,6 @@
           key: "dramaStrategist",
           code: "P03",
           relationCode: "R-M-F-I",
-          badge: "戏",
           name: "戏精军师",
           sentence: "表面云淡风轻，暗地里已布下天罗地网",
           figure: "陈平——六出奇计，貌若温厚而机深似海",
@@ -1599,7 +1781,6 @@
           key: "darkCensor",
           code: "P04",
           relationCode: "G-M-F-I",
-          badge: "御",
           name: "腹黑御史",
           sentence: "眉目犀利手段凌厉，城府深不可测",
           figure: "张汤——汉武酷吏之首，用法严刻而心计深",
@@ -1618,7 +1799,6 @@
           key: "rollKingGeneral",
           code: "P05",
           relationCode: "G-M-F-O",
-          badge: "将",
           name: "卷王将军",
           sentence: "精力无穷永不言倦，天生领袖气场全开",
           figure: "霍去病——封狼居胥，少年冠军侯卷到极致",
@@ -1637,7 +1817,6 @@
           key: "melonOverlord",
           code: "P06",
           relationCode: "G-E-F-O",
-          badge: "枭",
           name: "吃瓜枭雄",
           sentence: "豪爽外表暗藏野心，一边吃瓜一边布局",
           figure: "曹操——治世能臣乱世奸雄，谈笑间天下在握",
@@ -1656,7 +1835,6 @@
           key: "socialEscort",
           code: "P07",
           relationCode: "R-E-S-O",
-          badge: "镖",
           name: "社牛镖师",
           sentence: "走哪都是主场，嗓门大朋友多古道热肠",
           figure: "秦琼——马踏黄河两岸，交友遍天下",
@@ -1675,7 +1853,6 @@
           key: "introvertAssassin",
           code: "P08",
           relationCode: "G-E-F-I",
-          badge: "刺",
           name: "社恐刺客",
           sentence: "来去如风出手精准，事了拂衣深藏功名",
           figure: "聂政——一击而中，毁容自尽不累亲",
@@ -1694,7 +1871,6 @@
           key: "loafingScholar",
           code: "P09",
           relationCode: "R-M-S-I",
-          badge: "翰",
           name: "摸鱼翰林",
           sentence: "才华横溢却懒得外露，能躺绝不坐着",
           figure: "嵇康——竹林打铁，才华绝世偏爱摸鱼",
@@ -1713,7 +1889,6 @@
           key: "wellnessAbbot",
           code: "P10",
           relationCode: "R-E-S-I",
-          badge: "养",
           name: "养生方丈",
           sentence: "与世无争颐养天年，开口便是养生经",
           figure: "孙思邈——药王寿百岁，养生即是渡人",
@@ -1732,7 +1907,6 @@
           key: "cheatScholar",
           code: "P11",
           relationCode: "G-M-F-O",
-          badge: "状",
           name: "开挂状元",
           sentence: "天资聪颖一路开挂，唯恨时光不够用",
           figure: "王勃——六岁能文，滕王阁序惊艳千年",
@@ -1751,7 +1925,6 @@
           key: "foodieSquire",
           code: "P12",
           relationCode: "R-E-S-O",
-          badge: "员",
           name: "吃货员外",
           sentence: "天大地大吃饭最大，和气生财福气自来",
           figure: "苏东坡——黄州炖肉海南吃蚝，贬到哪吃到哪",
@@ -1770,7 +1943,6 @@
           key: "koiGoodPerson",
           code: "P15",
           relationCode: "R-E-S-O",
-          badge: "善",
           name: "锦鲤善人",
           sentence: "天生福星走到哪旺到哪，温厚正直人缘好",
           figure: "郭子仪——功高震主而主不疑，五福齐全",
@@ -1789,7 +1961,6 @@
           key: "sharpJudge",
           code: "P16",
           relationCode: "G-M-F-O",
-          badge: "判",
           name: "扎心判官",
           sentence: "眼光毒辣一针见血，嘴毒心不坏情商欠费",
           figure: "汲黯——直言敢谏，汉武帝亦敬而远之",
@@ -2836,6 +3007,26 @@
         };
       }
 
+      function getPortraitPosition(faceType) {
+        const index = Math.max(
+          personalityCatalog.findIndex((item) => item.key === faceType?.key),
+          0,
+        );
+        const column = index % 7;
+        const row = Math.floor(index / 7);
+        const x = column === 0 ? 0 : column === 6 ? 100 : (column / 6) * 100;
+        const y = row === 0 ? 0 : 100;
+        return `${x}% ${y}%`;
+      }
+
+      function getPortraitStyle(faceType) {
+        return `--portrait-position: ${getPortraitPosition(faceType)};`;
+      }
+
+      function getFigureName(faceType) {
+        return String(faceType?.figure || "").split("——")[0] || "古风人物";
+      }
+
       function renderAnalysis() {
         const target = document.getElementById("analysisCards");
         target.innerHTML = state.analyses
@@ -2847,9 +3038,9 @@
                   <span class="hint">面相人格</span>
                 </div>
                 <div class="type-card">
-                  <div class="type-avatar" role="img" aria-label="${note.faceType.name}人格印记">${note.faceType.badge}</div>
+                  <div class="type-avatar" style="${getPortraitStyle(note.faceType)}" role="img" aria-label="${note.faceType.name}历史人物画像"></div>
                   <div class="type-info">
-                    <div class="type-kicker">十六人格｜${note.faceType.code}</div>
+                    <div class="type-kicker">FBTI｜${note.faceType.code}</div>
                     <h4>${note.faceType.name}</h4>
                     <p>${note.faceType.sentence}</p>
                     <p class="figure-line">匹配人物：${note.faceType.figure}</p>
@@ -3026,7 +3217,7 @@
           reasonText: `${problem}之所以反复，常见原因不是谁克谁，而是“${firstNeed}”与“${secondNeed}”的顺序没对上。`,
           adviceText: `${pairing.advice} 日常可先做一件小事：把问题缩成一句请求、一个时间点、一个可执行动作。`,
           iceText: report.ice,
-          basisText: `依据：甲乙面相十六人格、${getLeadTerms(0)}、${getLeadTerms(1)}，以及关系类型「${state.relation}」。${state.guided ? "如已问诊，将结合选择题回答细化。" : "本次为面相快速合参，未调用大模型。"}`,
+          basisText: `依据：甲乙 FBTI 面相人格、${getLeadTerms(0)}、${getLeadTerms(1)}，以及关系类型「${state.relation}」。${state.guided ? "如已问诊，将结合选择题回答细化。" : "本次为面相快速合参，未调用大模型。"}`,
         };
       }
 
@@ -3052,6 +3243,59 @@
         document.getElementById("adviceText").textContent = normalized.adviceText;
         document.getElementById("iceText").textContent = normalized.iceText;
         document.getElementById("basisText").textContent = normalized.basisText;
+      }
+
+      function compactText(value, maxLength = 72) {
+        const clean = String(value || "").replace(/\s+/g, "");
+        return clean.length > maxLength ? `${clean.slice(0, maxLength)}...` : clean;
+      }
+
+      function renderSharePerson(label, analysis) {
+        const faceType = analysis?.faceType || personalityCatalog[0];
+        return `
+          <div class="share-person">
+            <div class="share-portrait" style="${getPortraitStyle(faceType)}" role="img" aria-label="${faceType.name}人物画像"></div>
+            <div>
+              <span>${label}相 FBTI</span>
+              <strong>${escapeHtml(faceType.name)}</strong>
+              <em>${escapeHtml(getFigureName(faceType))}</em>
+            </div>
+          </div>
+        `;
+      }
+
+      function renderShareCard(report = state.llmReport) {
+        const normalized = normalizeReport(report);
+        const first = state.analyses[0];
+        const second = state.analyses[1];
+        const pairing = getCurrentPairing();
+        const summary = `甲为${first?.faceType.name || "未定"}，乙为${second?.faceType.name || "未定"}，此局为「${normalized.signName}」。${compactText(pairing.text, 46)}`;
+        const advice = compactText(normalized.adviceText, 58);
+        document.getElementById("shareCard").innerHTML = `
+          <div class="share-brand">
+            <strong>两相知 FBTI</strong>
+            <span>${escapeHtml(state.relation)}合相签</span>
+          </div>
+          <h3>${escapeHtml(normalized.signName)}</h3>
+          <p class="share-summary">${escapeHtml(summary)}</p>
+          <div class="share-people">
+            ${renderSharePerson("甲", first)}
+            ${renderSharePerson("乙", second)}
+          </div>
+          <p class="share-signature">签文小抄：${escapeHtml(advice)}</p>
+          <small class="share-disclaimer">分析报告由 AI 生成，仅供娱乐</small>
+        `;
+      }
+
+      function showShareCard() {
+        renderShareCard(state.llmReport);
+        document.getElementById("shareSheet").classList.add("show");
+        document.getElementById("shareSheet").setAttribute("aria-hidden", "false");
+      }
+
+      function hideShareCard() {
+        document.getElementById("shareSheet").classList.remove("show");
+        document.getElementById("shareSheet").setAttribute("aria-hidden", "true");
       }
 
       function buildLlmPayload() {
@@ -3326,6 +3570,13 @@
       document.getElementById("again").addEventListener("click", () => {
         state.variant += 1;
         generateFinalReport();
+      });
+
+      document.getElementById("shareReport").addEventListener("click", showShareCard);
+      document.getElementById("closeShare").addEventListener("click", hideShareCard);
+      document.getElementById("shareBackdrop").addEventListener("click", hideShareCard);
+      document.addEventListener("keydown", (event) => {
+        if (event.key === "Escape") hideShareCard();
       });
     </script>
   </body>
